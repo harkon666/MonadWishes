@@ -469,3 +469,10 @@ Berikut adalah spesifikasi teknis dan parameter jaringan aktual yang disepakati 
 * **Konteks**: Menyoroti performa Monad 0.3s block time.
 * **Keputusan**:
   - Implementasikan live yield ticker di Vault details yang memperbarui estimasi bunga berjalan per detik (sub-second UI timer).
+
+### 📜 ADR-007: Deep Unified MonadVaultClient Module Architecture
+* **Status**: Disetujui (Approved)
+* **Konteks**: Operasi membaca vault (*Envio GraphQL + Viem RPC fallback*) terpisah dari transaksi penulisan vault.
+* **Keputusan**:
+  - Satukan logika membaca, menulis, fallback dual-source, dan auto-refetching di balik satu *deep module* (`useVaultClient`).
+  - Hapus *shallow interface* terpisah di UI; halaman cukup menggunakan API ringkas: `getVaults`, `createVault`, `contribute`, `releaseGift`.

@@ -68,6 +68,8 @@ When friend groups organize birthday gift pools 1 month prior to the event, conv
 - **ADR-004 (Memory NFT Viewer & Dual Claim Mode)**: Render SVG booklet inline via `tokenURI(tokenId)` and provide both Real Time-Lock & Demo Time Travel release triggers.
 - **ADR-005 (Indexer Config Sync)**: `indexer/config.yaml` synced to Vault contract `0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B`.
 - **ADR-006 (Sub-Second Live Yield Counter)**: Live ticker animation updated every 1000ms in frontend UI.
+- **ADR-007 (Deep Unified MonadVaultClient Module)**: Encapsulate reads, writes, dual-source fallback, and automated refetching into a unified `useVaultClient` hook interface.
+
 
 ---
 

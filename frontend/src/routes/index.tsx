@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Gift, Plus, Sparkles, Shield, Clock, Users, Flame, ChevronRight, Zap, RefreshCw, Database } from 'lucide-react'
 import CreateVaultModal from '../components/CreateVaultModal'
@@ -6,73 +6,26 @@ import VaultDetailsModal, { type VaultData } from '../components/VaultDetailsMod
 import TransactionToast from '../components/TransactionToast'
 import NetworkSwitchBanner from '../components/NetworkSwitchBanner'
 import { usePythPrice } from '../hooks/usePythPrice'
-import { useMonadVault } from '../hooks/useMonadVault'
-import { fetchLiveVaults } from '../services/indexer'
+import { useVaultClient } from '../hooks/useVaultClient'
 
 export const Route = createFileRoute('/')({ component: App })
 
-const INITIAL_VAULTS: VaultData[] = [
-  {
-    id: '1',
-    numericId: 1,
-    recipientName: 'Sarah Jenkins',
-    recipientAddress: '0x71CB290000000000000000000000000000000000',
-    creatorAddress: '0x3A291F3000000000000000000000000000000000',
-    targetAmountMon: 25.0,
-    totalCollectedMon: 18.5,
-    birthdayTimestamp: Date.now() + 14 * 86400000,
-    isClaimed: false,
-    greetings: [
-      { id: 'g1', sender: 'Bob (0x41...98)', amountMon: 5.0, message: 'Happy 25th Sarah! Have an amazing birthday 🎉', timestamp: new Date(Date.now() - 3600000) },
-      { id: 'g2', sender: 'Charlie (0x9F...A1)', amountMon: 3.5, message: 'Best wishes from the Monad dev team! 🚀', timestamp: new Date(Date.now() - 1800000) },
-      { id: 'g3', sender: 'Dave (0x88...C2)', amountMon: 10.0, message: 'Enjoy the yield and the party! 🎂', timestamp: new Date(Date.now() - 600000) },
-    ],
-  },
-  {
-    id: '2',
-    numericId: 2,
-    recipientName: 'Alex Rivera',
-    recipientAddress: '0x992D814000000000000000000000000000000000',
-    creatorAddress: '0x1F2C451000000000000000000000000000000000',
-    targetAmountMon: 50.0,
-    totalCollectedMon: 42.0,
-    birthdayTimestamp: Date.now() + 5 * 86400000,
-    isClaimed: false,
-    greetings: [
-      { id: 'g4', sender: 'Elena (0x02...89)', amountMon: 12.0, message: 'Happy birthday Alex! Let us celebrate 🥂', timestamp: new Date(Date.now() - 7200000) },
-      { id: 'g5', sender: 'Frank (0x55...34)', amountMon: 30.0, message: 'Big gift for a big friend! 🎁', timestamp: new Date(Date.now() - 2400000) },
-    ],
-  },
-]
-
 function App() {
   const { formatted: monPriceFormatted, price: monPrice } = usePythPrice()
-  const { toast, closeToast, executeCreateVault, executeContribute, executeReleaseGift } = useMonadVault()
+  const {
+    vaults,
+    isLoading,
+    dataSource,
+    toast,
+    closeToast,
+    createVault,
+    contribute,
+    releaseGift,
+    refetch,
+  } = useVaultClient()
 
-  const [vaults, setVaults] = useState<VaultData[]>(INITIAL_VAULTS)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedVault, setSelectedVault] = useState<VaultData | null>(null)
-  const [dataDataSource, setDataSource] = useState<'indexer' | 'rpc' | 'initial'>('initial')
-  const [isLoadingLive, setIsLoadingLive] = useState(false)
-
-  const loadOnChainVaults = async () => {
-    setIsLoadingLive(true)
-    try {
-      const { vaults: liveVaults, source } = await fetchLiveVaults()
-      if (liveVaults.length > 0) {
-        setVaults(liveVaults)
-        setDataSource(source)
-      }
-    } catch (err) {
-      console.warn('Failed to load live vaults:', err)
-    } finally {
-      setIsLoadingLive(false)
-    }
-  }
-
-  useEffect(() => {
-    loadOnChainVaults()
-  }, [])
 
   const handleCreateVault = async (newVaultData: {
     recipientName: string
@@ -80,100 +33,26 @@ function App() {
     targetAmountMon: number
     durationDays: number
   }) => {
-    const nextNumericId = vaults.length + 1
-    
-    // Execute Real On-Chain Transaction on Monad Testnet
     try {
-      await executeCreateVault(newVaultData)
+      await createVault(newVaultData)
     } catch {
-      // Fallback state update for UI resiliency
+      // Handled via toast inside useVaultClient
     }
-
-    const newVault: VaultData = {
-      id: `${nextNumericId}`,
-      numericId: nextNumericId,
-      recipientName: newVaultData.recipientName,
-      recipientAddress: newVaultData.recipientAddress,
-      creatorAddress: 'Your Privy Wallet',
-      targetAmountMon: newVaultData.targetAmountMon,
-      totalCollectedMon: 0,
-      birthdayTimestamp: Date.now() + newVaultData.durationDays * 86400000,
-      isClaimed: false,
-      greetings: [],
-    }
-
-    setVaults([newVault, ...vaults])
-    setSelectedVault(newVault)
   }
 
   const handleContribute = async (vaultId: string, amountMon: number, message: string) => {
-    const targetVault = vaults.find((v) => v.id === vaultId)
-    const numericId = targetVault?.numericId || parseInt(vaultId) || 1
-
     try {
-      await executeContribute(numericId, amountMon, message)
+      await contribute(vaultId, amountMon, message)
     } catch {
-      // Fallback state update
-    }
-
-    setVaults((prev) =>
-      prev.map((v) => {
-        if (v.id !== vaultId) return v
-        const updatedGreetings = [
-          {
-            id: `g-${Date.now()}`,
-            sender: 'You (Privy Wallet)',
-            amountMon,
-            message,
-            timestamp: new Date(),
-          },
-          ...v.greetings,
-        ]
-        return {
-          ...v,
-          totalCollectedMon: v.totalCollectedMon + amountMon,
-          greetings: updatedGreetings,
-        }
-      })
-    )
-
-    if (selectedVault && selectedVault.id === vaultId) {
-      setSelectedVault((prev) =>
-        prev
-          ? {
-              ...prev,
-              totalCollectedMon: prev.totalCollectedMon + amountMon,
-              greetings: [
-                {
-                  id: `g-${Date.now()}`,
-                  sender: 'You (Privy Wallet)',
-                  amountMon,
-                  message,
-                  timestamp: new Date(),
-                },
-                ...prev.greetings,
-              ],
-            }
-          : null
-      )
+      // Handled via toast inside useVaultClient
     }
   }
 
   const handleReleaseGift = async (vaultId: string, isDemoMode: boolean) => {
-    const targetVault = vaults.find((v) => v.id === vaultId)
-    const numericId = targetVault?.numericId || parseInt(vaultId) || 1
-
     try {
-      await executeReleaseGift(numericId, isDemoMode)
+      await releaseGift(vaultId, isDemoMode)
     } catch {
-      // Fallback state update
-    }
-
-    setVaults((prev) =>
-      prev.map((v) => (v.id === vaultId ? { ...v, isClaimed: true } : v))
-    )
-    if (selectedVault && selectedVault.id === vaultId) {
-      setSelectedVault((prev) => (prev ? { ...prev, isClaimed: true } : null))
+      // Handled via toast inside useVaultClient
     }
   }
 
@@ -200,15 +79,15 @@ function App() {
                 Pyth Live: 1 MON = {monPriceFormatted}
               </span>
               <button
-                onClick={loadOnChainVaults}
-                disabled={isLoadingLive}
+                onClick={refetch}
+                disabled={isLoading}
                 className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-400/10 px-3 py-1 text-xs font-semibold text-purple-300 hover:bg-purple-400/20 transition-all"
               >
                 <Database className="h-3 w-3 text-purple-400" />
                 <span>
-                  Source: {dataDataSource === 'indexer' ? 'Envio HyperIndex GraphQL' : dataDataSource === 'rpc' ? 'Monad Testnet RPC' : 'Local State'}
+                  Source: {dataSource === 'indexer' ? 'Envio HyperIndex GraphQL' : dataSource === 'rpc' ? 'Monad Testnet RPC' : 'Local State'}
                 </span>
-                <RefreshCw className={`h-3 w-3 ${isLoadingLive ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
               </button>
             </div>
 
