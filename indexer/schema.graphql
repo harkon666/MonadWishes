@@ -1,0 +1,32 @@
+type VaultEntity @entity {
+  id: ID!
+  vaultId: BigInt!
+  creator: String!
+  recipient: String!
+  recipientName: String!
+  targetAmount: BigInt!
+  birthdayTimestamp: BigInt!
+  totalCollected: BigInt!
+  isClaimed: Boolean!
+}
+
+type ContributionEntity @entity {
+  id: ID!
+  vaultId: BigInt!
+  contributor: String!
+  amount: BigInt!
+  message: String!
+  totalCollected: BigInt!
+  txHash: String!
+}
+
+type GiftClaimEntity @entity {
+  id: ID!
+  vaultId: BigInt!
+  recipient: String!
+  principalAmount: BigInt!
+  yieldBonus: BigInt!
+  totalPayout: BigInt!
+  nftTokenId: BigInt!
+  txHash: String!
+}

@@ -1,0 +1,16 @@
+{
+  "name": "monad-wishes-indexer",
+  "version": "1.0.0",
+  "description": "Envio HyperIndex for MonadWishes smart contract events on Monad Testnet",
+  "scripts": {
+    "codegen": "pnpx envio@3.0.0-alpha.21 codegen",
+    "build": "pnpx envio@3.0.0-alpha.21 codegen && tsc",
+    "deploy": "envio-cloud deploy"
+  },
+  "dependencies": {
+    "envio": "3.0.0-alpha.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

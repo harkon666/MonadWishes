@@ -1,0 +1,18 @@
+name: MonadWishesIndexer
+description: Envio HyperIndex event indexer for MonadWishes on Monad Testnet
+networks:
+  - id: 10143
+    start_block: 0
+    contracts:
+      - name: MonadBirthdayVault
+        address:
+          - "0x9f6c4609f6c4609f6c4609f6c4609f6c4609f6c4"
+        handler: src/EventHandlers.ts
+        events:
+          - event: VaultCreated(uint256 indexed vaultId, address indexed creator, address indexed recipient, string recipientName, uint256 targetAmount, uint256 birthdayTimestamp)
+          - event: ContributionReceived(uint256 indexed vaultId, address indexed contributor, uint256 amount, string message, uint256 totalCollected)
+          - event: GiftClaimed(uint256 indexed vaultId, address indexed recipient, uint256 principalAmount, uint256 yieldBonus, uint256 totalPayout, uint256 nftTokenId)
+
+field_selection:
+  transaction_fields:
+    - hash

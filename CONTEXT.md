@@ -410,9 +410,9 @@ Berikut adalah spesifikasi teknis dan parameter jaringan aktual yang disepakati 
 #### 3️⃣ Oracle Layer (Pyth Network Oracle)
 * **MON/USD Live Display**: Target kado disimpan dalam nominal **MON**, sementara harga estimasi **USD** di-fetch secara real-time dari Pyth Network Hermes Endpoint & Pyth Contract (`0x2880aB155794e7179c9eE2e38200202908C17B43`).
 
-#### 4️⃣ Frontend UX & Hackathon Demo Mode
-* **Real-time Activity Feed & Micro-Ticker**: Memanfaatkan Wagmi polling interval 1s + animasi ticker counter yield client-side 400ms untuk mendemonstrasikan kecepatan sub-second Monad di UI.
-* **Demo Mode / "Time Travel" Button**: Tombol khusus di UI untuk memajukan simulasi timestamp ke hari-H, sehingga juri dapat melihat detik-detik pencairan dana + yield secara instan dalam sesi demo 3 menit.
+#### 4️⃣ Indexer & Event Tracking Layer (Envio HyperIndex)
+* **On-Chain Event Indexing**: Menangkap event `VaultCreated`, `ContributionReceived`, dan `GiftClaimed` dari Monad Testnet secara sub-second.
+* **GraphQL Query Engine**: Menyediakan GraphQL API endpoint untuk query riwayat aktivitas vault, feed ucapan, dan sorting leaderboard secara instan tanpa membebani RPC node.
 
 ---
 
@@ -421,4 +421,4 @@ Berikut adalah spesifikasi teknis dan parameter jaringan aktual yang disepakati 
 2. **Oracle Layer**: Pyth Network Price Feed (MON/USD Live Pricing).
 3. **Smart Contract Layer**: Low-Level Call Monad Staking Precompile (`0x1000`) + Fallback Math + Dynamic On-Chain SVG NFT.
 4. **Execution Layer**: High-Frequency Feed & Sub-second Live Yield Ticker (0.3s Monad Block Time).
- 
+5. **Indexer Layer**: Envio HyperIndex Sub-second Monad Event Indexing & GraphQL API.
