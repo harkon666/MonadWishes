@@ -7,7 +7,10 @@ When friend groups organize birthday gift pools 1 month prior to the event, conv
 2. **Prohibitive Gas Fees**: High transaction fees on traditional L1/L2 networks prevent micro-contributions ($0.50 – $2.00) from large networks of friends.
 3. **Manual & Unreliable Disbursal**: Admins must manually remember and execute transfers at 00:00 on the recipient's birthday.
 4. **Lack of Emotional Memorabilia**: Monetary transfers offer no lasting emotional keepsake or consolidated group greeting record.
-5. **Web3 Onboarding Friction**: Non-crypto native friends struggle with wallet creation, seed phrases, and purchasing MON tokens for gas.
+5. **Web3 Onboarding Friction**: Non-crypto native friends struggle with wallet creation, seed phrases, and network configuration.
+6. **Slow Event Data Indexing**: Polling blockchain nodes directly causes sluggish UI loading for greeting feeds and active vault dashboards.
+
+---
 
 ## Solution
 
@@ -15,7 +18,10 @@ When friend groups organize birthday gift pools 1 month prior to the event, conv
 - **Time-Locked Gift Vaults**: Pools locked until the target birthday timestamp (e.g. 30 days).
 - **Auto-Staking & Yield Generation**: Capital is delegated to Monad Native Staking (`0x1000` precompile) with graceful math fallback, generating 0.5%/month yield during wait periods.
 - **Sub-Second Micro-Contributions & Greeting Feed**: 300ms–400ms block times and sub-cent gas fees ($0.001) allow real-time micro-donations and on-chain messages.
+- **Envio HyperIndex GraphQL Engine**: Sub-second event indexing for `VaultCreated`, `ContributionReceived`, and `GiftClaimed` with automatic viem RPC `readContract` fallback.
 - **Dynamic On-Chain SVG Memory Booklet NFT**: Upon claim, recipients receive a 100% on-chain SVG NFT containing gift stats, total yield, and greeting records.
+- **Enforced Network Switching (Chain ID 10143)**: Auto-detects wallet network mismatch and displays a 1-click "Switch to Monad Testnet" UI banner.
+- **Live Sub-Second Yield Ticker**: Real-time animated counter visualizing prorated yield growth every second to highlight Monad's high-frequency throughput.
 - **Frictionless Web2.5 UX (Privy SDK / EIP-7702)**: Social login (Google/Twitter) with paymaster gasless sponsorship.
 - **Live Fiat Pricing (Pyth Network Oracle)**: MON target amounts mapped dynamically to USD using Pyth Hermes off-chain price feeds.
 - **Hackathon Demo Mode**: 1-click time-travel simulation allowing judges to experience the instant 00:00 payout in 3-minute pitch presentations.
@@ -26,13 +32,14 @@ When friend groups organize birthday gift pools 1 month prior to the event, conv
 
 1. As a vault creator, I want to create a time-locked birthday gift pool for my friend by providing their name, wallet/social handle, target duration in days, and MON target amount, so that our friend group can start pooling funds immediately.
 2. As a contributor, I want to log in using my Google or Twitter account without installing a browser wallet, so that I can participate without Web3 technical barriers.
-3. As a contributor, I want to send micro-contributions (e.g. 0.1 MON or $1.00) without paying gas fees, so that my entire contribution goes directly to my friend's gift pool.
-4. As a contributor, I want to leave a personalized on-chain birthday message with my contribution, so that it is permanently recorded for my friend to read.
-5. As a group member, I want to view a real-time activity feed updating sub-second as friends contribute, so that I feel connected to the group effort.
-6. As a group member, I want to see the live target progress and yield counter updating in real-time with Pyth USD pricing, so that I know how close we are to our goal.
-7. As a recipient, I want funds (principal + accumulated DeFi yield) automatically unlocked on my birthday timestamp, so that I receive my gift immediately at midnight without needing an admin to manually send it.
-8. As a recipient, I want to claim my gift and receive a 100% on-chain Dynamic SVG NFT Memory Booklet, so that I have a permanent digital keepsake summarizing all messages and contributors.
-9. As a hackathon judge, I want a dedicated "Demo Mode / Time Travel" button on the UI, so that I can trigger and verify the time-lock release and NFT minting instantly within a 3-minute pitch.
+3. As a user whose wallet is connected to Sepolia or Ethereum Mainnet, I want an explicit warning banner with a 1-click "Switch to Monad Testnet" button, so that my transaction never fails due to network mismatch.
+4. As a contributor, I want to send micro-contributions (e.g. 0.1 MON or $1.00) without paying gas fees, so that my entire contribution goes directly to my friend's gift pool.
+5. As a contributor, I want to leave a personalized on-chain birthday message with my contribution, so that it is permanently recorded for my friend to read.
+6. As a group member, I want active vaults and greeting feeds loaded instantly via Envio HyperIndex GraphQL API with fallback to RPC node, so that the dashboard renders instantly without delay.
+7. As a group member, I want to see the live sub-second yield ticker updating in real-time alongside Pyth USD pricing, so that I can watch our yield accumulate live.
+8. As a recipient, I want funds (principal + accumulated DeFi yield) automatically unlocked on my birthday timestamp, so that I receive my gift immediately at midnight without needing an admin to manually send it.
+9. As a recipient, I want to view my 100% on-chain Dynamic SVG NFT Memory Booklet in an interactive modal, so that I can admire all messages and contributor stats.
+10. As a hackathon judge, I want a dedicated "⚡ Demo Time Travel Release" button on the UI, so that I can trigger and verify the time-lock release and NFT minting instantly within a 3-minute pitch presentation.
 
 ---
 
@@ -40,45 +47,43 @@ When friend groups organize birthday gift pools 1 month prior to the event, conv
 
 ### Core Architecture & Modules
 - **Smart Contract Layer (`contracts/src/`)**:
-  - `MonadBirthdayVault.sol`: Manages vault lifecycle (`createVault`, `contribute`, `releaseBirthdayGift`), greeting feed storage, Monad `0x1000` precompile delegation with fallback math, and yield calculation (`calculateYieldBonus`).
-  - `MonadBirthdayNFT.sol`: ERC721 contract minting dynamic base64-encoded on-chain SVG artwork containing recipient name, total payout, contributor count, and Monad branding gradients.
+  - `MonadBirthdayVault.sol`: Address `0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B`. Manages vault lifecycle, greeting storage, Monad `0x1000` precompile delegation, and yield calculation (`calculateYieldBonus`).
+  - `MonadBirthdayNFT.sol`: Address `0xa74f97D26a3783C94c8a925C3c2598cA80C8C579`. Dynamic base64-encoded on-chain SVG booklet artwork.
+- **Indexer Layer (`indexer/`)**:
+  - Envio HyperIndex indexing `VaultCreated`, `ContributionReceived`, and `GiftClaimed` events on Monad Testnet (`10143`).
+  - Schema entities: `VaultEntity`, `ContributionEntity`, `GiftClaimEntity`.
 - **Frontend Layer (`frontend/src/`)**:
   - React + TanStack Router + Tailwind CSS.
   - Wagmi / Viem configured for Monad Testnet (`Chain ID 10143`, RPC `https://testnet-rpc.monad.xyz`).
+  - `services/indexer.ts`: Service querying Envio GraphQL with automatic fallback to viem `publicClient.readContract`.
+  - `components/NetworkSwitchBanner.tsx`: Warning banner prompting network switch to Monad Testnet.
+  - `components/VaultDetailsModal.tsx`: Includes Live Sub-Second Yield Ticker component and Interactive Memory NFT Booklet modal.
   - Privy SDK for EIP-7702 Social Login & Account Abstraction Gasless Paymaster.
-  - Pyth Network SDK / Hermes API (`https://hermes-beta.pyth.network`) for MON/USD pricing feed.
+  - Pyth Network SDK / Hermes API for MON/USD pricing feed.
 
-### Key Technical & Protocol Seams
-- **Monad Precompile Integration (ADR-0001)**:
-  - Address: `0x0000000000000000000000000000000000001000`.
-  - Default Validator: `0x0000000000000000000000000000000000000001`.
-  - Low-level `call{value: 0}(abi.encodeWithSignature("delegate(address,uint256)", validator, amount))`. If precompile call fails/reverts on testnet, contract falls back to internal yield simulation (0.5% monthly prorated).
-- **100% Dynamic On-Chain SVG NFT (ADR-0003)**:
-  - No external IPFS dependency.
-  - `tokenURI(uint256)` returns `data:application/json;base64,...` wrapping pure SVG XML with glowing Monad purple/cyan gradients and unicode gift emojis.
-- **Oracle & USD Display (ADR-0004)**:
-  - Pyth Price Feed ID fetched from Hermes Beta API.
-  - Client side auto-refreshes MON/USD conversion every 1000ms.
-- **Hackathon Demo Mode**:
-  - `releaseBirthdayGift(uint256 vaultId, bool isDemoMode)` allows authorized creator/owner/recipient to bypass `block.timestamp >= birthdayTimestamp` during live demo testing.
+### Key Technical & Architectural Decisions (ADR Summary)
+- **ADR-001 (Envio Indexer & Viem Fallback)**: Primary data source is Envio GraphQL (`http://localhost:8080/v1/graphql`). If unreachable, frontend falls back seamlessly to viem `readContract` calls.
+- **ADR-002 (Protocol Reserve Yield Pool & Ticker)**: Vault contract includes `receive() external payable` for reserve funding. UI calculates sub-second live yield growth per second.
+- **ADR-003 (Network Auto-Switching UI)**: Prompt user when connected wallet chainId != `10143` to avoid `ContractFunctionExecutionError`.
+- **ADR-004 (Memory NFT Viewer & Dual Claim Mode)**: Render SVG booklet inline via `tokenURI(tokenId)` and provide both Real Time-Lock & Demo Time Travel release triggers.
+- **ADR-005 (Indexer Config Sync)**: `indexer/config.yaml` synced to Vault contract `0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B`.
+- **ADR-006 (Sub-Second Live Yield Counter)**: Live ticker animation updated every 1000ms in frontend UI.
 
 ---
 
 ## Testing Decisions
 
 ### Seams Strategy
-We establish two primary testing seams across the stack:
-
 1. **Contract Seam (Foundry Integration Suite)**:
-   - Primary test file: `contracts/test/MonadBirthdayVault.t.sol`.
-   - Tests full contract lifecycle:
-     - `test_CreateVault`: Validates vault parameter state and time-lock calculation.
-     - `test_ContributeAndGreetings`: Tests micro-contributions, accumulator math, and struct array storage for on-chain greetings.
-     - `test_ReleaseGiftDemoMode`: Validates instant demo release, yield calculation, payout transfer, and SVG NFT minting + tokenURI base64 validation.
-     - `test_ReleaseGiftTimeTravel`: Uses Foundry `vm.warp(block.timestamp + 31 days)` to simulate true temporal expiration and recipient release.
+   - File: `contracts/test/MonadBirthdayVault.t.sol`.
+   - Validates `createVault`, `contribute`, `calculateYieldBonus`, `releaseBirthdayGift` (both Demo and Time Travel mode), and SVG NFT `tokenURI` output.
 
-2. **Client Seam (Vite / Frontend Integration)**:
-   - Wagmi mock connector / testnet RPC tests verifying contract interaction bindings, Privy login state transitions, and Pyth price feed formatting.
+2. **Indexer Seam (Envio Local Testing)**:
+   - Validates event parsing for `VaultCreated`, `ContributionReceived`, `GiftClaimed`.
+
+3. **Frontend Integration Seam (Vite / React Testing)**:
+   - Tests `indexer.ts` GraphQL fetch with simulated fallback to viem `readContract`.
+   - Tests `ensureMonadNetwork()` chain ID validation and network switch triggers.
 
 ---
 
@@ -86,14 +91,13 @@ We establish two primary testing seams across the stack:
 
 - Multi-token ERC20 vault funding (USDC/USDT) — MVP focuses strictly on MON native asset.
 - Mainnet production deployment (targeting Monad Testnet Chain ID 10143).
-- Complex multi-sig vault permissions — Vault administration is streamlined for group social use.
 
 ---
 
 ## Further Notes
 
 - **Pitch Checklist (3-Minute Presentation)**:
-  1. UX Layer: Privy Embedded Social Login + Gasless EIP-7702.
-  2. Oracle Layer: Pyth Network MON/USD Live Price Feed.
-  3. Smart Contract Layer: Monad Staking Precompile (`0x1000`) + Fallback Math + Dynamic SVG NFT.
-  4. Execution Layer: High-Frequency Greeting Ticker leveraging 0.3s Monad block times.
+  1. UX Layer: Privy Embedded Social Login + Network Auto-Switch Banner.
+  2. Indexer Layer: Envio HyperIndex Sub-second Monad Event Indexing & Viem Fallback.
+  3. Smart Contract Layer: Monad Staking Precompile (`0x1000`) + Reserve Pool + Dynamic SVG NFT.
+  4. Execution Layer: High-Frequency Sub-Second Live Yield Counter Ticker (0.3s Monad block time).

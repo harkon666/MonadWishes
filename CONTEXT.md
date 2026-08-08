@@ -422,3 +422,50 @@ Berikut adalah spesifikasi teknis dan parameter jaringan aktual yang disepakati 
 3. **Smart Contract Layer**: Low-Level Call Monad Staking Precompile (`0x1000`) + Fallback Math + Dynamic On-Chain SVG NFT.
 4. **Execution Layer**: High-Frequency Feed & Sub-second Live Yield Ticker (0.3s Monad Block Time).
 5. **Indexer Layer**: Envio HyperIndex Sub-second Monad Event Indexing & GraphQL API.
+
+---
+
+## 📐 8. Keputusan Arsitektur & Real Use Case (ADRs - `/grill-with-docs`)
+
+### 📜 ADR-001: Integrasi Envio HyperIndex GraphQL Client & Fallback Engine
+* **Status**: Disetujui (Approved)
+* **Konteks**: Frontend saat ini mengandalkan mock array (`INITIAL_VAULTS`). Dibutuhkan indexing event `VaultCreated`, `ContributionReceived`, dan `GiftClaimed` untuk performa query sub-second tanpa membebani RPC Monad Node.
+* **Keputusan**: 
+  - Gunakan `config.yaml` Envio HyperIndex yang menunjuk ke alamat kontrak terdeploy (`0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B`).
+  - Frontend menggunakan `graphql-request` / TanStack Query untuk me-fetch list Vault dan Feed Ucapan dari GraphQL Envio (`http://localhost:8080/v1/graphql`).
+  - Sediakan **Resilient Fallback Engine** via viem `readContract` jika GraphQL indexer belum siap/offline, sehingga UI tidak pernah blank.
+
+### 📜 ADR-002: Protocol Reserve Yield Pool & Real-Time Sub-Second Yield Ticker
+* **Status**: Disetujui (Approved)
+* **Konteks**: Kontrak `MonadBirthdayVault.sol` mencoba low-level call ke Monad Native Staking Precompile (`0x1000`) dan memiliki rumus simulasi linear math (`0.5%` per 30 hari). 
+* **Keputusan**:
+  - Terapkan **Protocol Reserve Yield Pool** di mana kontrak memiliki fungsi penerimaan deposit (`receive() external payable`) untuk mensponsori bonus yield.
+  - Di frontend UI, buat komputasi live ticker bunga berjalan per detik berdasarkan durasi `createdAt` dan `totalCollected` untuk menghadirkan efek visual real-time pada block time 0.3s Monad.
+  - Payout saat `releaseBirthdayGift` mentransfer `totalCollected + yieldBonus` (atau dicap sebesar saldo kontrak jika reserve terbatas).
+
+### 📜 ADR-003: Enforce Network Auto-Switching UI (Monad Testnet Chain ID 10143)
+* **Status**: Disetujui (Approved)
+* **Konteks**: Wallet pengguna (seperti MetaMask/Privy) yang berada di network lain (misal Sepolia `11155111`) mengalami error `ContractFunctionExecutionError` saat memicu transaksi `createVault` / `contribute`.
+* **Keputusan**:
+  - Tambahkan pengecekan `ensureMonadNetwork()` di `useMonadVault` hook.
+  - Sediakan UI modal / banner pemberitahuan perpindahan network yang jelas ketika wallet belum terhubung ke Monad Testnet (`Chain ID 10143`), memberikan tombol 1-klik "Switch to Monad Testnet" sebelum transaksi dieksekusi.
+
+### 📜 ADR-004: Interactive Memory NFT Booklet Viewer & Dual Claim Mode
+* **Status**: Disetujui (Approved)
+* **Konteks**: Penerima mendapatkan Dynamic SVG NFT `MonadBirthdayNFT` saat pencairan.
+* **Keputusan**:
+  - Sediakan tab/modal "View Memory Booklet NFT" di Vault Details yang me-render kode SVG langsung dari `tokenURI(nftTokenId)`.
+  - Tampilkan tombol klaim dalam **Dual Action Mode**: Mode Resmi (aktif di hari ultah) & Mode Demo Time Travel (untuk pengujian juri hackathon).
+
+### 📜 ADR-005: Envio HyperIndex Config Update & Indexer Service with Viem Fallback
+* **Status**: Disetujui (Approved)
+* **Konteks**: Config indexer perlu dicocokkan dengan alamat Vault `0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B`.
+* **Keputusan**:
+  - Update `indexer/config.yaml` dengan alamat Vault aktual.
+  - Buat `frontend/src/services/indexer.ts` untuk memanggil GraphQL Envio dengan automatic fallback ke RPC `publicClient.readContract` viem.
+
+### 📜 ADR-006: Sub-Second Live Yield Counter Ticker UI
+* **Status**: Disetujui (Approved)
+* **Konteks**: Menyoroti performa Monad 0.3s block time.
+* **Keputusan**:
+  - Implementasikan live yield ticker di Vault details yang memperbarui estimasi bunga berjalan per detik (sub-second UI timer).
