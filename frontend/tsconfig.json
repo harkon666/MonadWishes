@@ -3,7 +3,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "module": "ESNext",
+    "allowJs": true,
     "paths": {
       "#/*": ["./src/*"],
       "@/*": ["./src/*"]

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { PrivyProvider } from '@privy-io/react-auth'
+import { createConfig, WagmiProvider } from '@privy-io/wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createConfig, WagmiProvider, http } from 'wagmi'
+import { http } from 'wagmi'
 import { monadTestnet } from '../config/monad'
 
 const queryClient = new QueryClient({
@@ -17,7 +18,6 @@ export const wagmiConfig = createConfig({
   transports: {
     [monadTestnet.id]: http('https://testnet-rpc.monad.xyz'),
   },
-  ssr: true,
 })
 
 interface Web3ProviderProps {
@@ -32,15 +32,6 @@ export default function Web3Provider({ children }: Web3ProviderProps) {
   }, [])
 
   const privyAppId = import.meta.env.VITE_PRIVY_APP_ID || 'cmsjz9g5v007a0el4gkpcvptt'
-
-  // During SSR or initial hydration, render query client wrapper to prevent window/IndexedDB 500 errors
-  if (!mounted) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    )
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,9 +54,18 @@ export default function Web3Provider({ children }: Web3ProviderProps) {
         }}
       >
         <WagmiProvider config={wagmiConfig}>
-          {children}
+          {mounted ? children : (
+            <div className="min-h-screen bg-[#0A0518] text-white flex items-center justify-center font-sans">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#836EF9] to-[#00E5FF] animate-pulse" />
+                <span className="text-xs font-semibold tracking-wider text-slate-400">Loading MonadWishes...</span>
+              </div>
+            </div>
+          )}
         </WagmiProvider>
       </PrivyProvider>
     </QueryClientProvider>
   )
 }
+
+
