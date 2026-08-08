@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { usePrivy } from '@privy-io/react-auth'
-import { Wallet, LogIn, LogOut, Gift, Sparkles, Copy, Check } from 'lucide-react'
+import { useBalance } from 'wagmi'
+import { formatEther } from 'viem'
+import { Wallet, LogIn, LogOut, Gift, Sparkles, Copy, Check, Coins } from 'lucide-react'
 
+import { monadTestnet } from '../config/monad'
 
 export default function Header() {
   const [mounted, setMounted] = useState(false)
@@ -73,6 +76,17 @@ function PrivyHeaderControls() {
 
   const userIdentifier = user?.email?.address || user?.twitter?.username || truncatedAddress || 'Connected'
 
+  // Fetch live MON balance for the Privy wallet on Monad Testnet
+  const { data: balanceData, isLoading: isBalanceLoading } = useBalance({
+    address: walletAddress as `0x${string}` | undefined,
+    chainId: monadTestnet.id,
+  })
+
+  const formattedBalance = balanceData
+    ? `${parseFloat(formatEther(balanceData.value)).toFixed(3)} MON`
+    : '0.000 MON'
+
+
   const handleCopyAddress = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (walletAddress) {
@@ -85,6 +99,15 @@ function PrivyHeaderControls() {
   if (authenticated) {
     return (
       <div className="flex items-center gap-2">
+        {/* Monad Native Token Balance Badge */}
+        {walletAddress && (
+          <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-[#00E5FF]/30 bg-[#00E5FF]/10 px-3 py-1.5 text-xs font-bold text-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.2)]">
+            <Coins className="h-3.5 w-3.5 text-[#00E5FF]" />
+            <span>{isBalanceLoading ? '...' : formattedBalance}</span>
+          </div>
+        )}
+
+        {/* User Identity / Wallet Address Pill */}
         <div className="flex items-center gap-2 rounded-full border border-[#836EF9]/40 bg-[#200052]/60 px-3.5 py-1.5 text-xs font-semibold text-white shadow-inner">
           <span className="h-2 w-2 rounded-full bg-[#00E5FF] animate-pulse" />
           <Wallet className="h-3.5 w-3.5 text-[#836EF9]" />
@@ -130,4 +153,5 @@ function PrivyHeaderControls() {
     </button>
   )
 }
+
 
