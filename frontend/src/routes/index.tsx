@@ -340,7 +340,7 @@ function App() {
           isOpen={!!selectedVault}
           onClose={() => setSelectedVault(null)}
           onContribute={handleContribute}
-          onRelease={handleReleaseGift}
+          onReleaseGift={handleReleaseGift}
         />
       )}
 
