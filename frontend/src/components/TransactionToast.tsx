@@ -21,26 +21,26 @@ export default function TransactionToast({ toast, onClose }: TransactionToastPro
   const truncatedHash = toast.txHash ? `${toast.txHash.slice(0, 10)}...${toast.txHash.slice(-8)}` : null
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-bounce-short">
-      <div className="relative overflow-hidden rounded-2xl border border-[#836EF9]/50 bg-[#0E0720]/95 p-4 shadow-[0_0_40px_rgba(131,110,249,0.4)] backdrop-blur-xl text-white">
+    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full">
+      <div className="relative rounded-xl border-4 border-black bg-[#FFFDF5] p-4 shadow-[6px_6px_0px_0px_#000] text-black">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 rounded-full p-1 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+          className="absolute top-3 right-3 rounded-md border-2 border-black bg-[#FF5252] p-1 text-black hover:bg-[#FF0000] hover:text-white shadow-[2px_2px_0px_0px_#000] transition-colors"
         >
-          <X className="h-4 w-4" />
+          <X className="h-4 w-4 stroke-[3]" />
         </button>
 
         {/* Submitting / Mining */}
         {(toast.status === 'submitting' || toast.status === 'mining') && (
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xl bg-[#00E5FF]/10 text-[#00E5FF]">
+            <div className="p-2 rounded-lg border-2 border-black bg-[#00E5FF] text-black shrink-0 shadow-[2px_2px_0px_0px_#000]">
               <Loader2 className="h-5 w-5 animate-spin" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-[#00E5FF]">
+              <h4 className="text-sm font-black uppercase text-black">
                 {toast.status === 'submitting' ? 'Confirm in Wallet...' : 'Mining on Monad (0.3s)...'}
               </h4>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs font-bold text-black mt-0.5">
                 {toast.message || 'Executing smart contract transaction on Monad Testnet.'}
               </p>
               {explorerUrl && (
@@ -48,7 +48,7 @@ export default function TransactionToast({ toast, onClose }: TransactionToastPro
                   href={explorerUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#00E5FF] hover:underline"
+                  className="mt-2 inline-flex items-center gap-1 text-[11px] font-black uppercase text-black bg-[#00E5FF] px-2 py-0.5 border border-black shadow-[1px_1px_0px_0px_#000] hover:underline"
                 >
                   <span>Tx: {truncatedHash}</span>
                   <ExternalLink className="h-3 w-3" />
@@ -61,14 +61,14 @@ export default function TransactionToast({ toast, onClose }: TransactionToastPro
         {/* Success */}
         {toast.status === 'success' && (
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
-              <CheckCircle2 className="h-5 w-5" />
+            <div className="p-2 rounded-lg border-2 border-black bg-[#CCFF00] text-black shrink-0 shadow-[2px_2px_0px_0px_#000]">
+              <CheckCircle2 className="h-5 w-5 stroke-[3]" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-emerald-400">
+              <h4 className="text-sm font-black uppercase text-black">
                 Transaction Confirmed! 🎉
               </h4>
-              <p className="text-xs text-slate-200 mt-0.5">
+              <p className="text-xs font-bold text-black mt-0.5">
                 {toast.message || 'Smart contract state updated live on Monad Blockchain.'}
               </p>
               {explorerUrl && (
@@ -76,9 +76,9 @@ export default function TransactionToast({ toast, onClose }: TransactionToastPro
                   href={explorerUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-[#CCFF00] px-2.5 py-1 text-[11px] font-black uppercase text-black shadow-[2px_2px_0px_0px_#000] hover:bg-[#00E5FF] transition-all"
                 >
-                  <span>View on Monad Explorer ({truncatedHash})</span>
+                  <span>View on Explorer ({truncatedHash})</span>
                   <ExternalLink className="h-3 w-3" />
                 </a>
               )}
@@ -89,12 +89,12 @@ export default function TransactionToast({ toast, onClose }: TransactionToastPro
         {/* Error */}
         {toast.status === 'error' && (
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xl bg-rose-500/20 text-rose-400">
+            <div className="p-2 rounded-lg border-2 border-black bg-[#FF5252] text-white shrink-0 shadow-[2px_2px_0px_0px_#000]">
               <AlertCircle className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-rose-400">Transaction Failed</h4>
-              <p className="text-xs text-slate-300 mt-0.5 line-clamp-2">
+              <h4 className="text-sm font-black uppercase text-black">Transaction Failed</h4>
+              <p className="text-xs font-bold text-black mt-0.5 line-clamp-2">
                 {toast.errorMessage || 'Transaction was rejected or failed on Monad Testnet.'}
               </p>
             </div>

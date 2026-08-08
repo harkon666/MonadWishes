@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Gift, Plus, Sparkles, Shield, Clock, Users, Flame, ChevronRight, Zap, RefreshCw, Database } from 'lucide-react'
+import { Gift, Plus, Sparkles, Shield, Clock, Users, Flame, ChevronRight, Zap, RefreshCw, Database, ArrowRight } from 'lucide-react'
 import CreateVaultModal from '../components/CreateVaultModal'
 import VaultDetailsModal, { type VaultData } from '../components/VaultDetailsModal'
 import TransactionToast from '../components/TransactionToast'
@@ -11,7 +11,7 @@ import { useVaultClient } from '../hooks/useVaultClient'
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
-  const { formatted: monPriceFormatted, price: monPrice } = usePythPrice()
+  const { formatted: monPriceFormatted } = usePythPrice()
   const {
     vaults,
     isLoading,
@@ -56,227 +56,295 @@ function App() {
     }
   }
 
-
   return (
-    <>
+    <div className="min-h-screen bg-[#FFFDF5] text-black font-sans selection:bg-[#CCFF00] selection:text-black">
       <NetworkSwitchBanner />
-      <main className="max-w-7xl mx-auto px-4 pb-16 pt-6">
-        {/* Hero Banner */}
-        <section className="relative overflow-hidden rounded-[2.5rem] border border-[#836EF9]/40 bg-gradient-to-b from-[#180A38] via-[#0E0720] to-[#0A0518] px-6 py-12 sm:px-12 sm:py-16 shadow-[0_0_80px_rgba(131,110,249,0.2)]">
-          {/* Glow Spheres */}
-          <div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(131,110,249,0.35),transparent_70%)]" />
-          <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.25),transparent_70%)]" />
+      
+      {/* Neo-Brutalist Hero Header Section with Video Background */}
+      <section className="relative overflow-hidden border-b-4 border-black bg-black px-6 py-12 sm:px-12 sm:py-20 shadow-[0_6px_0px_0px_#000]">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-50 filter saturate-150 contrast-125"
+          src="/video/hero-bg.mp4"
+        />
+        {/* Dark Vignette Overlay for High Legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40 z-0" />
 
-          <div className="relative z-10">
-            {/* Top Badges */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#00E5FF]/40 bg-[#00E5FF]/10 px-3.5 py-1.5 text-xs font-semibold text-[#00E5FF] shadow-inner">
-                <Zap className="h-3.5 w-3.5 fill-[#00E5FF]" />
-                Monad 0.3s Block Time • Sub-Second Finality
+        <div className="relative z-10 max-w-7xl mx-auto flex flex-col gap-6">
+          
+          {/* Top Ticker Badges */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-md border-3 border-black bg-[#CCFF00] px-3.5 py-1.5 text-xs font-black uppercase text-black shadow-[3px_3px_0px_0px_#000]">
+              <Zap className="h-4 w-4 fill-black text-black" />
+              Monad 0.3s Block Time • Sub-Second Finality
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-md border-3 border-black bg-[#00E5FF] px-3.5 py-1.5 text-xs font-black uppercase text-black shadow-[3px_3px_0px_0px_#000]">
+              <Sparkles className="h-4 w-4 text-black" />
+              Pyth Live: 1 MON = {monPriceFormatted}
+            </span>
+            <button
+              onClick={refetch}
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 rounded-md border-3 border-black bg-white px-3.5 py-1.5 text-xs font-black uppercase text-black shadow-[3px_3px_0px_0px_#000] hover:bg-[#FFD600] transition-all cursor-pointer"
+            >
+              <Database className="h-4 w-4 text-black" />
+              <span>
+                Source: {dataSource === 'indexer' ? 'Envio HyperIndex GraphQL' : dataSource === 'rpc' ? 'Monad Testnet RPC' : 'Local State'}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1.5 text-xs font-semibold text-amber-300">
-                <Sparkles className="h-3.5 w-3.5" />
-                Pyth Live: 1 MON = {monPriceFormatted}
+              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+
+          {/* Main Neo-Brutalist Heading */}
+          <div className="space-y-4 max-w-4xl">
+            <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-7xl text-white">
+              MONEY & WISHES,{' '}
+              <span className="bg-[#CCFF00] text-black px-3 py-1 border-4 border-black inline-block shadow-[6px_6px_0px_0px_#000] -rotate-1">
+                DECODED.
               </span>
-              <button
-                onClick={refetch}
-                disabled={isLoading}
-                className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-400/10 px-3 py-1 text-xs font-semibold text-purple-300 hover:bg-purple-400/20 transition-all"
-              >
-                <Database className="h-3 w-3 text-purple-400" />
-                <span>
-                  Source: {dataSource === 'indexer' ? 'Envio HyperIndex GraphQL' : dataSource === 'rpc' ? 'Monad Testnet RPC' : 'Local State'}
-                </span>
-                <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
+            </h1>
+            <p className="max-w-2xl text-lg font-bold text-slate-100 sm:text-xl border-l-4 border-[#CCFF00] pl-4 bg-black/40 p-2 border border-black/50 backdrop-blur-sm">
+              Pool birthday gift funds with friends, earn auto-staking DeFi yield during the wait, and deliver instant 00:00 payouts + 100% On-Chain SVG Memory NFTs.
+            </p>
+          </div>
 
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight bg-gradient-to-r from-white via-[#E0E0FF] to-[#00E5FF] bg-clip-text text-transparent sm:text-6xl">
-            Social Birthday Gift Pools & Yield Vaults on Monad.
-          </h1>
-
-          <p className="mt-4 max-w-2xl text-base text-slate-300 sm:text-lg">
-            Pool birthday gift funds with friends, earn auto-staking DeFi yield during the wait, and deliver instant 00:00 payouts + 100% On-Chain SVG Memory NFTs.
-          </p>
-
-          {/* Call to Action */}
-          <div className="mt-8 flex flex-wrap gap-4">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-4 pt-4">
             <button
               onClick={() => setIsCreateOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#836EF9] via-[#654AF7] to-[#00E5FF] px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_0_30px_rgba(131,110,249,0.6)] hover:scale-105 transition-all"
+              className="flex items-center gap-2 rounded-lg border-4 border-black bg-[#CCFF00] px-6 py-3.5 text-base font-black uppercase text-black shadow-[5px_5px_0px_0px_#000] hover:bg-[#FFD600] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none transition-all cursor-pointer"
             >
-              <Plus className="h-4 w-4 stroke-[3]" />
+              <Plus className="h-5 w-5 stroke-[3]" />
               <span>Create Birthday Vault</span>
             </button>
             <a
-              href="#vaults"
-              className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/10 transition-colors"
+              href="#vaults-section"
+              className="flex items-center gap-2 rounded-lg border-4 border-black bg-white px-6 py-3.5 text-base font-black uppercase text-black shadow-[5px_5px_0px_0px_#000] hover:bg-[#00E5FF] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none transition-all"
             >
-              <span>Explore Live Vaults</span>
-              <ChevronRight className="h-4 w-4" />
+              <span>Explore All Vaults</span>
+              <ArrowRight className="h-5 w-5 stroke-[3]" />
             </a>
           </div>
+
         </div>
       </section>
 
-      {/* Feature Highlights Grid */}
-      <section className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [
-            'Time-Locked Vaults',
-            'Funds locked safely until 00:00 on recipient birthday timestamp.',
-            Gift,
-            'text-[#836EF9]',
-          ],
-          [
-            'Monad Native Yield',
-            'Delegated to 0x1000 precompile generating 0.5%/mo yield bonus.',
-            Flame,
-            'text-amber-400',
-          ],
-          [
-            'Gasless Micro-Tips',
-            'Send $0.50 micro-tips with messages via EIP-7702 paymaster.',
-            Shield,
-            'text-[#00E5FF]',
-          ],
-          [
-            'On-Chain SVG Booklet',
-            'Recipients receive dynamic 100% on-chain memory NFT on claim.',
-            Sparkles,
-            'text-pink-400',
-          ],
-        ].map(([title, desc, Icon, colorClass], index) => (
-          <article
-            key={title as string}
-            className="rounded-2xl border border-[#200052] bg-[#0E0720]/80 p-5 backdrop-blur-md transition-all hover:border-[#836EF9]/50 hover:bg-[#160B33]"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className={`p-2 rounded-xl bg-white/5 ${colorClass as string}`}>
-                {/* @ts-expect-error jsx component */}
-                <Icon className="h-5 w-5" />
-              </div>
-              <h2 className="text-sm font-bold text-white">{title as string}</h2>
-            </div>
-            <p className="m-0 text-xs text-slate-400 leading-relaxed">{desc as string}</p>
-          </article>
-        ))}
-      </section>
+      {/* Neo-Brutalist Infinite Scrolling Marquee Banner */}
+      <div className="overflow-hidden border-b-4 border-black bg-[#111111] py-3 text-white shadow-[0_4px_0px_0px_#000]">
+        <div className="flex items-center">
+          {/* Static Tag Label */}
+          <div className="shrink-0 bg-[#CCFF00] text-black font-black uppercase px-4 py-1.5 border-r-4 border-black text-xs sm:text-sm tracking-wider z-10 shadow-[4px_0px_0px_0px_#000]">
+            FEATURED ON MONAD
+          </div>
 
-      {/* Live Vaults Section */}
-      <section id="vaults" className="mt-14">
-        <div className="flex items-center justify-between mb-8">
+          {/* Scrolling Content Track (Duplicated for Seamless Loop) */}
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 font-black uppercase text-xs sm:text-sm tracking-wider text-slate-200 pl-6">
+            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
+            <span className="text-slate-500">•</span>
+            <span>PRIVY EIP-7702 SOCIAL LOGIN</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-[#00E5FF]">✦ MONAD NATIVE STAKING PRECOMPILE (0x1000)</span>
+            <span className="text-slate-500">•</span>
+            <span>PYTH ORACLE LIVE MON/USD PRICING</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-amber-300">✦ 100% ON-CHAIN DYNAMIC SVG NFT BOOKLET</span>
+            <span className="text-slate-500">•</span>
+            <span>ENVIO HYPERINDEX GRAPHQL EVENT INDEXER</span>
+            <span className="text-slate-500">•</span>
+
+            {/* Duplicate for seamless infinite loop */}
+            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
+            <span className="text-slate-500">•</span>
+            <span>PRIVY EIP-7702 SOCIAL LOGIN</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-[#00E5FF]">✦ MONAD NATIVE STAKING PRECOMPILE (0x1000)</span>
+            <span className="text-slate-500">•</span>
+            <span>PYTH ORACLE LIVE MON/USD PRICING</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-amber-300">✦ 100% ON-CHAIN DYNAMIC SVG NFT BOOKLET</span>
+            <span className="text-slate-500">•</span>
+            <span>ENVIO HYPERINDEX GRAPHQL EVENT INDEXER</span>
+            <span className="text-slate-500">•</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-4 py-16 space-y-16" id="vaults-section">
+        
+        {/* Section Title */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-4 border-black pb-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-              <Gift className="h-6 w-6 text-[#00E5FF]" />
-              Active Birthday Gift Vaults
+            <span className="bg-[#FFD600] text-black font-black px-2 py-0.5 border-2 border-black uppercase text-xs shadow-[2px_2px_0px_0px_#000]">
+              Active Pools
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-black mt-2">
+              ACTIVE BIRTHDAY <span className="bg-[#CCFF00] px-2 border-3 border-black shadow-[3px_3px_0px_0px_#000]">VAULTS.</span>
             </h2>
-            <p className="text-xs text-slate-400">
-              Contribute micro-tips with on-chain wishes or create a vault for your friends.
-            </p>
           </div>
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="hidden sm:flex items-center gap-2 rounded-xl border border-[#836EF9]/40 bg-[#836EF9]/20 px-4 py-2 text-xs font-semibold text-white hover:bg-[#836EF9]/40 transition-colors"
+            className="flex items-center gap-2 rounded-md border-3 border-black bg-[#00E5FF] px-4 py-2 text-sm font-black uppercase text-black shadow-[3px_3px_0px_0px_#000] hover:bg-[#CCFF00] transition-all cursor-pointer"
           >
-            <Plus className="h-3.5 w-3.5" />
-            <span>New Vault</span>
+            <Plus className="h-4 w-4 stroke-[3]" />
+            <span>New Pool</span>
           </button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {vaults.map((v) => {
-            const collectedUsd = (v.totalCollectedMon * monPrice).toFixed(2)
-            const targetUsd = (v.targetAmountMon * monPrice).toFixed(2)
-            const progress = Math.min(100, Math.round((v.totalCollectedMon / v.targetAmountMon) * 100))
+        {/* Vault Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {vaults.map((vault, idx) => {
+            const progressPercent = Math.min(
+              100,
+              Math.round((vault.totalCollectedMon / vault.targetAmountMon) * 100)
+            )
+            const isCompleted = vault.totalCollectedMon >= vault.targetAmountMon
+            const rotateClass = idx % 2 === 0 ? '-rotate-1' : 'rotate-1'
 
             return (
               <div
-                key={v.id}
-                className="group relative overflow-hidden rounded-3xl border border-[#200052] bg-[#0E0720] p-6 shadow-lg transition-all hover:border-[#00E5FF]/50 hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]"
+                key={vault.id}
+                onClick={() => setSelectedVault(vault)}
+                className={`group relative rounded-2xl border-4 border-black bg-white p-6 shadow-[6px_6px_0px_0px_#000] hover:shadow-[10px_10px_0px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] transition-all cursor-pointer ${rotateClass}`}
               >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#836EF9] to-[#00E5FF] p-0.5 shadow-md">
-                      <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-[#0E0720]">
-                        <Gift className="h-6 w-6 text-[#00E5FF]" />
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white group-hover:text-[#00E5FF] transition-colors">
-                        {v.recipientName}
-                      </h3>
-                      <p className="text-xs text-slate-400 font-mono">
-                        Target: {v.targetAmountMon} MON (${targetUsd})
-                      </p>
-                    </div>
-                  </div>
-                  {v.isClaimed ? (
-                    <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-1 text-[11px] font-bold text-emerald-400">
-                      ✓ Claimed
+                {/* Header Tag */}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <span className="rounded-md border-2 border-black bg-[#CCFF00] px-2.5 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0px_0px_#000]">
+                    Vault #{vault.numericId || vault.id}
+                  </span>
+                  {vault.isClaimed ? (
+                    <span className="rounded-md border-2 border-black bg-emerald-300 px-2.5 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0px_0px_#000]">
+                      Claimed & Minted
+                    </span>
+                  ) : isCompleted ? (
+                    <span className="rounded-md border-2 border-black bg-[#00E5FF] px-2.5 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0px_0px_#000]">
+                      Goal Reached
                     </span>
                   ) : (
-                    <span className="rounded-full bg-[#836EF9]/20 border border-[#836EF9]/40 px-3 py-1 text-[11px] font-bold text-[#00E5FF] flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> Time-Locked
+                    <span className="rounded-md border-2 border-black bg-[#FFD600] px-2.5 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0px_0px_#000]">
+                      Active Patungan
                     </span>
                   )}
                 </div>
 
-                {/* Progress Bar */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-xs font-semibold mb-1">
-                    <span className="text-slate-300">Collected: {v.totalCollectedMon.toFixed(2)} MON (${collectedUsd})</span>
-                    <span className="text-[#00E5FF]">{progress}%</span>
+                {/* Recipient Title */}
+                <h3 className="text-2xl font-black uppercase text-black tracking-wide border-b-3 border-black pb-2 mb-4">
+                  {vault.recipientName}'s Vault
+                </h3>
+
+                {/* Progress Stats */}
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-between text-sm font-black uppercase">
+                    <span className="text-slate-700">Collected Pool</span>
+                    <span className="text-black bg-[#CCFF00] px-1.5 border border-black shadow-[1px_1px_0px_0px_#000]">
+                      {vault.totalCollectedMon} / {vault.targetAmountMon} MON
+                    </span>
                   </div>
-                  <div className="h-2.5 w-full rounded-full bg-[#160B33] overflow-hidden">
+
+                  {/* Brutalist Progress Bar */}
+                  <div className="h-4 w-full rounded-md border-3 border-black bg-slate-100 p-0.5 shadow-[2px_2px_0px_0px_#000]">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#836EF9] to-[#00E5FF]"
-                      style={{ width: `${progress}%` }}
+                      className="h-full rounded bg-[#CCFF00] border-r-2 border-black transition-all duration-500"
+                      style={{ width: `${progressPercent}%` }}
                     />
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-black uppercase text-black pt-1">
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5" />
+                      {vault.greetings.length} Contributors
+                    </span>
+                    <span className="flex items-center gap-1 bg-[#00E5FF] px-1.5 border border-black">
+                      <Flame className="h-3.5 w-3.5 text-black" />
+                      +0.5% APY Staked
+                    </span>
                   </div>
                 </div>
 
-                {/* Footer Info */}
-                <div className="flex items-center justify-between pt-3 border-t border-[#200052] text-xs">
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <Users className="h-3.5 w-3.5 text-amber-400" />
-                    <span>{v.greetings.length} Contributor Wishes</span>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedVault(v)}
-                    className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#836EF9] to-[#00E5FF] px-4 py-2 font-bold text-white shadow-md hover:scale-105 transition-transform"
-                  >
-                    <span>View & Wish</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
+                {/* Action Footer */}
+                <div className="pt-2 border-t-3 border-black flex items-center justify-between">
+                  <span className="text-xs font-black uppercase text-black flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5" />
+                    {vault.isClaimed ? 'Gift Unlocked' : 'Time-Locked'}
+                  </span>
+                  <button className="flex items-center gap-1 rounded-md border-2 border-black bg-black px-3 py-1.5 text-xs font-black uppercase text-[#CCFF00] shadow-[2px_2px_0px_0px_#000] group-hover:bg-[#CCFF00] group-hover:text-black transition-colors">
+                    <span>View Vault</span>
+                    <ChevronRight className="h-4 w-4 stroke-[3]" />
                   </button>
                 </div>
               </div>
             )
           })}
         </div>
+
+      </main>
+
+      {/* Featured Royal Blue Cobalt Banner (Matching Reference Image Section) */}
+      <section className="bg-[#0038FF] border-y-4 border-black px-6 py-16 text-center text-white shadow-[0_6px_0px_0px_#000]">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <span className="bg-[#CCFF00] text-black font-black px-3 py-1 border-3 border-black uppercase text-sm shadow-[3px_3px_0px_0px_#000] inline-block -rotate-1">
+            Monad Ecosystem Hackathon Project
+          </span>
+          <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white leading-tight">
+            READY TO SEE GIFT POOLS <span className="bg-[#CCFF00] text-black px-2 border-4 border-black shadow-[4px_4px_0px_0px_#000] inline-block">DIFFERENTLY?</span>
+          </h2>
+          <p className="text-lg font-bold text-slate-100 max-w-xl mx-auto">
+            Zero gas friction with Privy Social Login, sub-second 0.3s Monad block time, and 100% on-chain SVG booklet NFTs.
+          </p>
+          <div className="pt-4">
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="inline-flex items-center gap-3 rounded-xl border-4 border-black bg-[#CCFF00] px-8 py-4 text-xl font-black uppercase text-black shadow-[6px_6px_0px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none transition-all cursor-pointer"
+            >
+              <Gift className="h-6 w-6 stroke-[3]" />
+              <span>Create Your Vault Now ➔</span>
+            </button>
+          </div>
+        </div>
       </section>
 
-      {/* Modals */}
-      <CreateVaultModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onCreate={handleCreateVault}
-      />
+      {/* Neo-Brutalist Footer */}
+      <footer className="bg-[#111111] text-white border-t-4 border-black px-6 py-12">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 bg-[#CCFF00] border-3 border-black text-black font-black flex items-center justify-center rounded shadow-[2px_2px_0px_0px_#FFF]">
+              🎁
+            </div>
+            <div>
+              <span className="text-lg font-black uppercase text-[#CCFF00]">MonadWishes</span>
+              <p className="text-xs text-slate-400 font-bold">Built for Monad Blockchain Hackathon 2026</p>
+            </div>
+          </div>
+          <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+            Smart Contracts Deployed on Monad Testnet (Chain ID 10143)
+          </div>
+        </div>
+      </footer>
 
-      <VaultDetailsModal
-        isOpen={!!selectedVault}
-        vault={selectedVault}
-        onClose={() => setSelectedVault(null)}
-        onContribute={handleContribute}
-        onReleaseGift={handleReleaseGift}
-      />
+      {/* Modals & Toast */}
+      {isCreateOpen && (
+        <CreateVaultModal
+          isOpen={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+          onCreate={handleCreateVault}
+        />
+      )}
 
-      {/* Transaction Notification Toast */}
+      {selectedVault && (
+        <VaultDetailsModal
+          vault={selectedVault}
+          isOpen={!!selectedVault}
+          onClose={() => setSelectedVault(null)}
+          onContribute={handleContribute}
+          onRelease={handleReleaseGift}
+        />
+      )}
+
       <TransactionToast toast={toast} onClose={closeToast} />
-    </main>
-    </>
+    </div>
   )
 }
-
