@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { usePrivy } from '@privy-io/react-auth'
-import { Wallet, LogIn, LogOut, Gift, Sparkles } from 'lucide-react'
+import { Wallet, LogIn, LogOut, Gift, Sparkles, Copy, Check } from 'lucide-react'
+
 
 export default function Header() {
   const [mounted, setMounted] = useState(false)
@@ -63,6 +64,7 @@ export default function Header() {
 
 function PrivyHeaderControls() {
   const { login, logout, authenticated, user } = usePrivy()
+  const [copied, setCopied] = useState(false)
 
   const walletAddress = user?.wallet?.address
   const truncatedAddress = walletAddress
@@ -71,6 +73,15 @@ function PrivyHeaderControls() {
 
   const userIdentifier = user?.email?.address || user?.twitter?.username || truncatedAddress || 'Connected'
 
+  const handleCopyAddress = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (walletAddress) {
+      navigator.clipboard.writeText(walletAddress)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   if (authenticated) {
     return (
       <div className="flex items-center gap-2">
@@ -78,7 +89,25 @@ function PrivyHeaderControls() {
           <span className="h-2 w-2 rounded-full bg-[#00E5FF] animate-pulse" />
           <Wallet className="h-3.5 w-3.5 text-[#836EF9]" />
           <span>{userIdentifier}</span>
+          
+          {walletAddress && (
+            <button
+              onClick={handleCopyAddress}
+              className="ml-1 rounded-md p-1 text-slate-400 hover:bg-[#836EF9]/30 hover:text-[#00E5FF] transition-all flex items-center gap-1 group relative"
+              title="Copy Privy Wallet Address"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400 font-bold">Copied!</span>
+                </>
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+            </button>
+          )}
         </div>
+
         <button
           onClick={logout}
           className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
@@ -101,3 +130,4 @@ function PrivyHeaderControls() {
     </button>
   )
 }
+
