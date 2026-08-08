@@ -5,9 +5,9 @@ Create UI form for building a new Time-Locked Birthday Vault (recipient name, wa
 
 **Blocked by:** 02 — Privy Social Login & Monad Testnet Web3 Provider Integration.
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] Vault creation route and interactive form component built with validation
-- [ ] Pyth Hermes price feed hook fetching live MON/USD rate
-- [ ] Dynamic USD equivalent display updating in real-time
-- [ ] Contract `createVault` invocation and success redirect to vault details page
+- [x] Vault creation route and interactive form component built with validation
+- [x] Pyth Hermes price feed hook fetching live MON/USD rate
+- [x] Dynamic USD equivalent display updating in real-time
+- [x] Contract `createVault` invocation and success redirect to vault details page

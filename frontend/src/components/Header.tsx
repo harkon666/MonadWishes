@@ -1,76 +1,84 @@
 import { Link } from '@tanstack/react-router'
-import ThemeToggle from './ThemeToggle'
+import { usePrivy } from '@privy-io/react-auth'
+import { Wallet, LogIn, LogOut, Gift, Sparkles } from 'lucide-react'
 
 export default function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
-      <nav className="page-wrap flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-4">
-        <h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm text-[var(--sea-ink)] no-underline shadow-[0_8px_24px_rgba(30,90,72,0.08)] sm:px-4 sm:py-2"
-          >
-            <span className="h-2 w-2 rounded-full bg-[linear-gradient(90deg,#56c6be,#7ed3bf)]" />
-            TanStack Start
-          </Link>
-        </h2>
+  const { login, logout, authenticated, user } = usePrivy()
 
-        <div className="order-3 flex w-full flex-wrap items-center gap-x-4 gap-y-1 pb-1 text-sm font-semibold sm:order-none sm:w-auto sm:flex-nowrap sm:pb-0">
+  const walletAddress = user?.wallet?.address
+  const truncatedAddress = walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : null
+
+  const userIdentifier = user?.email?.address || user?.twitter?.username || truncatedAddress || 'Connected'
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-[#200052]/50 bg-[#0A0518]/80 px-4 backdrop-blur-xl">
+      <nav className="max-w-7xl mx-auto flex flex-wrap items-center justify-between py-3 sm:py-4">
+        {/* Brand Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2.5 no-underline group"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#836EF9] to-[#00E5FF] shadow-[0_0_20px_rgba(131,110,249,0.4)] group-hover:scale-105 transition-transform">
+            <Gift className="h-5 w-5 text-white" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-white via-[#E0E0FF] to-[#00E5FF] bg-clip-text text-transparent">
+              MonadWishes
+            </span>
+            <span className="text-[10px] font-medium tracking-widest text-[#00E5FF] uppercase">
+              Monad Testnet • 0.3s
+            </span>
+          </div>
+        </Link>
+
+        {/* Navigation Links */}
+        <div className="flex items-center gap-6 text-sm font-medium text-slate-300">
           <Link
             to="/"
-            className="nav-link"
-            activeProps={{ className: 'nav-link is-active' }}
+            className="hover:text-white transition-colors"
+            activeProps={{ className: 'text-[#00E5FF] font-semibold' }}
           >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            className="nav-link"
-            activeProps={{ className: 'nav-link is-active' }}
-          >
-            About
+            Explore Vaults
           </Link>
           <a
-            href="https://tanstack.com/start/latest/docs/framework/react/overview"
-            className="nav-link"
+            href="https://testnet.monadexplorer.com"
             target="_blank"
             rel="noreferrer"
+            className="hover:text-white transition-colors hidden sm:block"
           >
-            Docs
+            Explorer
           </a>
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
-          <a
-            href="https://x.com/tan_stack"
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
-          >
-            <span className="sr-only">Follow TanStack on X</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M12.6 1h2.2L10 6.48 15.64 15h-4.41L7.78 9.82 3.23 15H1l5.14-5.84L.72 1h4.52l3.12 4.73L12.6 1zm-.77 12.67h1.22L4.57 2.26H3.26l8.57 11.41z"
-              />
-            </svg>
-          </a>
-          <a
-            href="https://github.com/TanStack"
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-xl p-2 text-[var(--sea-ink-soft)] transition hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)] sm:block"
-          >
-            <span className="sr-only">Go to TanStack GitHub</span>
-            <svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24">
-              <path
-                fill="currentColor"
-                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-              />
-            </svg>
-          </a>
-
-          <ThemeToggle />
+        {/* Social Login / Wallet Auth Button */}
+        <div className="flex items-center gap-3">
+          {authenticated ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 rounded-full border border-[#836EF9]/40 bg-[#200052]/60 px-3.5 py-1.5 text-xs font-semibold text-white shadow-inner">
+                <span className="h-2 w-2 rounded-full bg-[#00E5FF] animate-pulse" />
+                <Wallet className="h-3.5 w-3.5 text-[#836EF9]" />
+                <span>{userIdentifier}</span>
+              </div>
+              <button
+                onClick={logout}
+                className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                title="Disconnect"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={login}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#836EF9] to-[#00E5FF] px-5 py-2 text-sm font-semibold text-white shadow-[0_0_20px_rgba(131,110,249,0.5)] hover:shadow-[0_0_30px_rgba(0,229,255,0.6)] hover:scale-[1.02] transition-all"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Login with Privy</span>
+              <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-spin" style={{ animationDuration: '3s' }} />
+            </button>
+          )}
         </div>
       </nav>
     </header>

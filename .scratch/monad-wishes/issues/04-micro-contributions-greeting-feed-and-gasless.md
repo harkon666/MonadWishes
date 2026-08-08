@@ -5,9 +5,9 @@ Interactive Vault details page featuring a sub-second updating activity feed for
 
 **Blocked by:** 03 — Vault Creation Form & Pyth Oracle Live MON/USD Ticker.
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] Vault details page showing vault status, countdown timer, and live yield accumulator
-- [ ] Contribution modal/form with message input and preset MON tip buttons
-- [ ] Sub-second polling (1s Wagmi interval) rendering new greetings in live feed
-- [ ] Gasless contribution submission verified
+- [x] Vault details page showing vault status, countdown timer, and live yield accumulator
+- [x] Contribution modal/form with message input and preset MON tip buttons
+- [x] Sub-second polling (1s Wagmi interval) rendering new greetings in live feed
+- [x] Gasless contribution submission verified

@@ -5,10 +5,10 @@ Complete smart contract layer in Solidity for MonadWishes (`MonadBirthdayVault.s
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] `MonadBirthdayVault.sol` compiled and configured with `MonadBirthdayNFT.sol` address
-- [ ] `createVault`, `contribute`, `releaseBirthdayGift`, and getter functions working
-- [ ] Monad precompile `0x1000` low-level call with simulated yield fallback verified
-- [ ] On-chain SVG NFT metadata URI returns valid base64 JSON with Monad gradients
-- [ ] All tests in `MonadBirthdayVault.t.sol` passing cleanly
+- [x] `MonadBirthdayVault.sol` compiled and configured with `MonadBirthdayNFT.sol` address
+- [x] `createVault`, `contribute`, `releaseBirthdayGift`, and getter functions working
+- [x] Monad precompile `0x1000` low-level call with simulated yield fallback verified
+- [x] On-chain SVG NFT metadata URI returns valid base64 JSON with Monad gradients
+- [x] All tests in `MonadBirthdayVault.t.sol` passing cleanly

@@ -5,9 +5,9 @@ Configure Privy SDK and Wagmi/Viem provider in the React / TanStack Router front
 
 **Blocked by:** 01 — Smart Contract Vault & Dynamic SVG NFT Core Engine.
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] PrivyProvider wrapped around main app with Monad Testnet chain definition
-- [ ] Header / Navigation social login button (Google / Twitter / Embedded Wallet)
-- [ ] Wallet connection state accessible across routes
-- [ ] EIP-7702 paymaster gasless sponsorship enabled for transactions
+- [x] PrivyProvider wrapped around main app with Monad Testnet chain definition
+- [x] Header / Navigation social login button (Google / Twitter / Embedded Wallet)
+- [x] Wallet connection state accessible across routes
+- [x] EIP-7702 paymaster gasless sponsorship enabled for transactions
