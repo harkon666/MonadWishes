@@ -46,9 +46,16 @@ export default function VaultDetailsModal({
 
   useEffect(() => {
     if (!vault) return
-    // Calculate live yield simulation (0.5% monthly prorated)
-    const yieldAmount = (vault.totalCollectedMon * 0.005) + (vault.greetings.length * 0.02)
-    setSimulatedYieldMon(yieldAmount)
+    // Base yield calculation (0.5% monthly prorated) + greetings bonus
+    const baseYield = (vault.totalCollectedMon * 0.005) + (vault.greetings.length * 0.02)
+    setSimulatedYieldMon(baseYield)
+
+    // Sub-second live yield ticker animation (increments slightly every second)
+    const interval = setInterval(() => {
+      setSimulatedYieldMon((prev) => prev + 0.0000012)
+    }, 1000)
+
+    return () => clearInterval(interval)
   }, [vault])
 
   if (!isOpen || !vault) return null
@@ -97,9 +104,17 @@ export default function VaultDetailsModal({
                 {vault.recipientName}'s Birthday Vault
               </h2>
               {vault.isClaimed && (
-                <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-0.5 text-xs font-semibold text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Claimed
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 px-3 py-0.5 text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Claimed
+                  </span>
+                  <button
+                    onClick={() => setShowNftModal(true)}
+                    className="rounded-full bg-[#00E5FF]/20 border border-[#00E5FF]/40 px-3 py-0.5 text-xs font-bold text-[#00E5FF] hover:bg-[#00E5FF]/30 transition-all flex items-center gap-1"
+                  >
+                    <Trophy className="h-3.5 w-3.5 text-amber-300" /> View Memory Booklet NFT
+                  </button>
+                </div>
               )}
             </div>
             <p className="text-xs text-slate-400 font-mono mt-0.5">

@@ -106,6 +106,7 @@ export function useMonadVault() {
           parseEther(data.targetAmountMon.toString()),
         ],
         chainId: monadTestnet.id,
+        gas: 850_000n,
       })
 
       setToast({
@@ -154,6 +155,7 @@ export function useMonadVault() {
         args: [BigInt(vaultIdNum), message],
         value: parseEther(amountMon.toString()),
         chainId: monadTestnet.id,
+        gas: 850_000n,
       })
 
       setToast({
@@ -203,6 +205,7 @@ export function useMonadVault() {
         functionName: 'releaseBirthdayGift',
         args: [BigInt(vaultIdNum), isDemoMode],
         chainId: monadTestnet.id,
+        gas: 1_200_000n,
       })
 
       setToast({

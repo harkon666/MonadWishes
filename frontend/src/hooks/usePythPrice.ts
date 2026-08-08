@@ -20,9 +20,9 @@ export function usePythPrice() {
 
     async function fetchPythPrice() {
       try {
-        // Pyth Hermes Beta API for MON / USD price feed
+        // Pyth Hermes API for MON / USD price feed
         const res = await fetch(
-          'https://hermes-beta.pyth.network/v2/updates/price/latest?ids[]=0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d'
+          'https://hermes.pyth.network/v2/updates/price/latest?ids[]=0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d'
         )
         if (res.ok) {
           const json = await res.json()

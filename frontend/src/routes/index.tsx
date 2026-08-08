@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Gift, Plus, Sparkles, Shield, Clock, Users, Flame, ChevronRight, Zap } from 'lucide-react'
+import { Gift, Plus, Sparkles, Shield, Clock, Users, Flame, ChevronRight, Zap, RefreshCw, Database } from 'lucide-react'
 import CreateVaultModal from '../components/CreateVaultModal'
 import VaultDetailsModal, { type VaultData } from '../components/VaultDetailsModal'
 import TransactionToast from '../components/TransactionToast'
+import NetworkSwitchBanner from '../components/NetworkSwitchBanner'
 import { usePythPrice } from '../hooks/usePythPrice'
 import { useMonadVault } from '../hooks/useMonadVault'
+import { fetchLiveVaults } from '../services/indexer'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -50,6 +52,27 @@ function App() {
   const [vaults, setVaults] = useState<VaultData[]>(INITIAL_VAULTS)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedVault, setSelectedVault] = useState<VaultData | null>(null)
+  const [dataDataSource, setDataSource] = useState<'indexer' | 'rpc' | 'initial'>('initial')
+  const [isLoadingLive, setIsLoadingLive] = useState(false)
+
+  const loadOnChainVaults = async () => {
+    setIsLoadingLive(true)
+    try {
+      const { vaults: liveVaults, source } = await fetchLiveVaults()
+      if (liveVaults.length > 0) {
+        setVaults(liveVaults)
+        setDataSource(source)
+      }
+    } catch (err) {
+      console.warn('Failed to load live vaults:', err)
+    } finally {
+      setIsLoadingLive(false)
+    }
+  }
+
+  useEffect(() => {
+    loadOnChainVaults()
+  }, [])
 
   const handleCreateVault = async (newVaultData: {
     recipientName: string
@@ -156,25 +179,38 @@ function App() {
 
 
   return (
-    <main className="max-w-7xl mx-auto px-4 pb-16 pt-10">
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-[2.5rem] border border-[#836EF9]/40 bg-gradient-to-b from-[#180A38] via-[#0E0720] to-[#0A0518] px-6 py-12 sm:px-12 sm:py-16 shadow-[0_0_80px_rgba(131,110,249,0.2)]">
-        {/* Glow Spheres */}
-        <div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(131,110,249,0.35),transparent_70%)]" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.25),transparent_70%)]" />
+    <>
+      <NetworkSwitchBanner />
+      <main className="max-w-7xl mx-auto px-4 pb-16 pt-6">
+        {/* Hero Banner */}
+        <section className="relative overflow-hidden rounded-[2.5rem] border border-[#836EF9]/40 bg-gradient-to-b from-[#180A38] via-[#0E0720] to-[#0A0518] px-6 py-12 sm:px-12 sm:py-16 shadow-[0_0_80px_rgba(131,110,249,0.2)]">
+          {/* Glow Spheres */}
+          <div className="pointer-events-none absolute -left-20 -top-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(131,110,249,0.35),transparent_70%)]" />
+          <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(0,229,255,0.25),transparent_70%)]" />
 
-        <div className="relative z-10">
-          {/* Top Badges */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#00E5FF]/40 bg-[#00E5FF]/10 px-3.5 py-1.5 text-xs font-semibold text-[#00E5FF] shadow-inner">
-              <Zap className="h-3.5 w-3.5 fill-[#00E5FF]" />
-              Monad 0.3s Block Time • Sub-Second Finality
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1.5 text-xs font-semibold text-amber-300">
-              <Sparkles className="h-3.5 w-3.5" />
-              Pyth Live: 1 MON = {monPriceFormatted}
-            </span>
-          </div>
+          <div className="relative z-10">
+            {/* Top Badges */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#00E5FF]/40 bg-[#00E5FF]/10 px-3.5 py-1.5 text-xs font-semibold text-[#00E5FF] shadow-inner">
+                <Zap className="h-3.5 w-3.5 fill-[#00E5FF]" />
+                Monad 0.3s Block Time • Sub-Second Finality
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1.5 text-xs font-semibold text-amber-300">
+                <Sparkles className="h-3.5 w-3.5" />
+                Pyth Live: 1 MON = {monPriceFormatted}
+              </span>
+              <button
+                onClick={loadOnChainVaults}
+                disabled={isLoadingLive}
+                className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-400/10 px-3 py-1 text-xs font-semibold text-purple-300 hover:bg-purple-400/20 transition-all"
+              >
+                <Database className="h-3 w-3 text-purple-400" />
+                <span>
+                  Source: {dataDataSource === 'indexer' ? 'Envio HyperIndex GraphQL' : dataDataSource === 'rpc' ? 'Monad Testnet RPC' : 'Local State'}
+                </span>
+                <RefreshCw className={`h-3 w-3 ${isLoadingLive ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
 
           <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight bg-gradient-to-r from-white via-[#E0E0FF] to-[#00E5FF] bg-clip-text text-transparent sm:text-6xl">
             Social Birthday Gift Pools & Yield Vaults on Monad.
@@ -361,6 +397,7 @@ function App() {
       {/* Transaction Notification Toast */}
       <TransactionToast toast={toast} onClose={closeToast} />
     </main>
+    </>
   )
 }
 
