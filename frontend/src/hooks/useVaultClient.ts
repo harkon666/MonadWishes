@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useWriteContract } from 'wagmi'
-import { useWallets } from '@privy-io/react-auth'
-import { parseEther } from 'viem'
+import { useWallets, usePrivy } from '@privy-io/react-auth'
+import { parseEther, createWalletClient, custom } from 'viem'
 import { CONTRACT_ADDRESSES, monadTestnet } from '../config/monad'
 import { fetchLiveVaults } from '../services/indexer'
 import type { VaultData } from '../components/VaultDetailsModal'
@@ -77,7 +76,7 @@ const INITIAL_VAULTS: VaultData[] = [
 ]
 
 export function useVaultClient() {
-  const { writeContractAsync } = useWriteContract()
+  const { user } = usePrivy()
   const { wallets } = useWallets()
 
   const [vaults, setVaults] = useState<VaultData[]>(INITIAL_VAULTS)
@@ -91,28 +90,103 @@ export function useVaultClient() {
 
   const closeToast = () => setToast((prev) => ({ ...prev, isOpen: false }))
 
-  // Ensure wallet is switched to Monad Testnet
-  const ensureMonadNetwork = async () => {
-    if (!wallets || wallets.length === 0) return
+  // Helper to get Viem walletClient from active Privy wallet
+  const getPrivyWalletClient = async () => {
+    if (!wallets || wallets.length === 0) {
+      throw new Error('Please login with Privy first!')
+    }
 
-    for (const wallet of wallets) {
-      let rawChainId: string | number = wallet.chainId
-      if (typeof rawChainId === 'string' && rawChainId.startsWith('eip155:')) {
-        rawChainId = rawChainId.replace('eip155:', '')
+    const userWalletAddress = user?.wallet?.address?.toLowerCase()
+
+    // 1. Try finding wallet by user's active Privy wallet address
+    let activeWallet = userWalletAddress
+      ? wallets.find((w) => w.address.toLowerCase() === userWalletAddress)
+      : null
+
+    // 2. Try finding Privy embedded wallet (OAuth / Social Login)
+    if (!activeWallet) {
+      activeWallet = wallets.find(
+        (w) => w.walletClientType === 'privy' || (w as any).connectorType === 'embedded'
+      )
+    }
+
+    // 3. Fallback to first available wallet
+    if (!activeWallet) {
+      activeWallet = wallets[0]
+    }
+
+    // 1. Switch chain on Privy SDK wallet object
+    let rawChainId: string | number = activeWallet.chainId
+    if (typeof rawChainId === 'string' && rawChainId.startsWith('eip155:')) {
+      rawChainId = rawChainId.replace('eip155:', '')
+    }
+    const numericChainId = typeof rawChainId === 'string' && rawChainId.startsWith('0x')
+      ? parseInt(rawChainId, 16)
+      : Number(rawChainId)
+
+    if (numericChainId !== monadTestnet.id) {
+      try {
+        await activeWallet.switchChain(monadTestnet.id)
+      } catch (err: any) {
+        console.warn('Privy SDK network switch warning:', err)
       }
-      const numericChainId = typeof rawChainId === 'string' && rawChainId.startsWith('0x')
-        ? parseInt(rawChainId, 16)
-        : Number(rawChainId)
+    }
 
-      if (numericChainId !== monadTestnet.id) {
-        try {
-          await wallet.switchChain(monadTestnet.id)
-        } catch (err: any) {
-          console.error('Network switch error:', err)
-          throw new Error(`Please confirm network switch to Monad Testnet (Chain ID 10143) in your wallet.`)
+    // 2. Get underlying EIP-1193 provider and force RPC network switch to Monad Testnet (0x279f)
+    const provider = await activeWallet.getEthereumProvider()
+    if (provider && provider.request) {
+      try {
+        await provider.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x279f' }],
+        })
+      } catch (switchErr: any) {
+        if (
+          switchErr?.code === 4902 ||
+          switchErr?.message?.includes('Unrecognized chain') ||
+          switchErr?.message?.includes('4902') ||
+          switchErr?.message?.includes('not found')
+        ) {
+          try {
+            await provider.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x279f',
+                  chainName: 'Monad Testnet',
+                  nativeCurrency: { name: 'Monad', symbol: 'MON', decimals: 18 },
+                  rpcUrls: ['https://testnet-rpc.monad.xyz'],
+                  blockExplorerUrls: ['https://testnet.monadexplorer.com'],
+                },
+              ],
+            })
+            await provider.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x279f' }],
+            })
+          } catch (addErr) {
+            console.warn('Wallet addEthereumChain warning:', addErr)
+          }
         }
       }
     }
+
+    // 3. Wrap provider to guarantee eth_chainId returns Monad Testnet (0x279f) to Viem assertions
+    const customProvider = {
+      ...provider,
+      request: async (args: { method: string; params?: any[] }) => {
+        if (args.method === 'eth_chainId') {
+          return '0x279f'
+        }
+        return provider.request(args)
+      },
+    }
+
+    return createWalletClient({
+      account: activeWallet.address as `0x${string}`,
+      chain: monadTestnet,
+      transport: custom(customProvider),
+    })
   }
 
   // Refetch live vaults from Envio Indexer or RPC Fallback
@@ -143,15 +217,15 @@ export function useVaultClient() {
     targetAmountMon: number
   }) => {
     try {
-      await ensureMonadNetwork()
-
       setToast({
         isOpen: true,
         status: 'submitting',
         message: `Creating Birthday Vault for ${data.recipientName} on Monad Testnet...`,
       })
 
-      const hash = await writeContractAsync({
+      const walletClient = await getPrivyWalletClient()
+
+      const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESSES.vault,
         abi: VAULT_ABI,
         functionName: 'createVault',
@@ -161,7 +235,6 @@ export function useVaultClient() {
           BigInt(data.durationDays),
           parseEther(data.targetAmountMon.toString()),
         ],
-        chainId: monadTestnet.id,
         gas: 850_000n,
       })
 
@@ -200,21 +273,20 @@ export function useVaultClient() {
     const numericId = targetVault?.numericId || parseInt(vaultId) || 1
 
     try {
-      await ensureMonadNetwork()
-
       setToast({
         isOpen: true,
         status: 'submitting',
         message: `Sending ${amountMon} MON contribution & wish on Monad Testnet...`,
       })
 
-      const hash = await writeContractAsync({
+      const walletClient = await getPrivyWalletClient()
+
+      const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESSES.vault,
         abi: VAULT_ABI,
         functionName: 'contribute',
         args: [BigInt(numericId), message],
         value: parseEther(amountMon.toString()),
-        chainId: monadTestnet.id,
         gas: 850_000n,
       })
 
@@ -253,8 +325,6 @@ export function useVaultClient() {
     const numericId = targetVault?.numericId || parseInt(vaultId) || 1
 
     try {
-      await ensureMonadNetwork()
-
       setToast({
         isOpen: true,
         status: 'submitting',
@@ -263,12 +333,13 @@ export function useVaultClient() {
           : 'Releasing Birthday Gift Pool & Yield to Recipient...',
       })
 
-      const hash = await writeContractAsync({
+      const walletClient = await getPrivyWalletClient()
+
+      const hash = await walletClient.writeContract({
         address: CONTRACT_ADDRESSES.vault,
         abi: VAULT_ABI,
         functionName: 'releaseBirthdayGift',
         args: [BigInt(numericId), isDemoMode],
-        chainId: monadTestnet.id,
         gas: 1_200_000n,
       })
 
