@@ -7,13 +7,12 @@ import "../src/MonadBirthdayVault.sol";
 
 contract DeployMonadWishes is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
-        address deployer = vm.addr(deployerPrivateKey);
+        vm.startBroadcast();
+
+        address deployer = msg.sender;
 
         console.log("Deploying MonadWishes contracts on Monad Testnet (Chain ID 10143)...");
         console.log("Deployer Address:", deployer);
-
-        vm.startBroadcast(deployerPrivateKey);
 
         // 1. Deploy MonadBirthdayNFT
         MonadBirthdayNFT nft = new MonadBirthdayNFT(deployer);
