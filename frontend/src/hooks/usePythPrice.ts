@@ -9,8 +9,8 @@ export interface PythPriceData {
 
 export function usePythPrice() {
   const [data, setData] = useState<PythPriceData>({
-    price: 1.50, // Default MON/USD initial estimate for hackathon demo
-    formatted: '$1.50 USD',
+    price: 0.02, // Initial MON/USD estimate
+    formatted: '$0.02 USD',
     lastUpdated: Date.now(),
     loading: false,
   })
@@ -20,9 +20,9 @@ export function usePythPrice() {
 
     async function fetchPythPrice() {
       try {
-        // Pyth Hermes API for MON / USD price feed
+        // Pyth Hermes API for MON / USD price feed (Monad / US Dollar)
         const res = await fetch(
-          'https://hermes.pyth.network/v2/updates/price/latest?ids[]=0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d'
+          'https://hermes.pyth.network/v2/updates/price/latest?ids[]=0x31491744e2dbf6df7fcf4ac0820d18a609b49076d45066d3568424e62f686cd1'
         )
         if (res.ok) {
           const json = await res.json()
@@ -32,7 +32,7 @@ export function usePythPrice() {
             if (rawPrice > 0 && isMounted) {
               setData({
                 price: rawPrice,
-                formatted: `$${rawPrice.toFixed(2)} USD`,
+                formatted: `$${rawPrice < 0.1 ? rawPrice.toFixed(4) : rawPrice.toFixed(2)} USD`,
                 lastUpdated: Date.now(),
                 loading: false,
               })
@@ -45,11 +45,11 @@ export function usePythPrice() {
       }
 
       if (isMounted) {
-        // Slight dynamic variance every 5 seconds for live presentation feel
-        const simulatedPrice = 1.48 + Math.random() * 0.05
+        // Slight dynamic variance for demo presentation feel
+        const simulatedPrice = 0.02 + Math.random() * 0.001
         setData({
           price: simulatedPrice,
-          formatted: `$${simulatedPrice.toFixed(2)} USD`,
+          formatted: `$${simulatedPrice.toFixed(4)} USD`,
           lastUpdated: Date.now(),
           loading: false,
         })
