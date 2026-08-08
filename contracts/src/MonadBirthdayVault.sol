@@ -59,7 +59,12 @@ contract MonadBirthdayVault is Ownable, ReentrancyGuard {
         string message,
         uint256 totalCollected
     );
-    event StakedInMonadPrecompile(uint256 indexed vaultId, uint256 amount, bool precompileSuccess);
+    event StakedInMonadPrecompile(
+        uint256 indexed vaultId,
+        address indexed targetPrecompile,
+        uint256 amount,
+        bool precompileSuccess
+    );
     event GiftClaimed(
         uint256 indexed vaultId,
         address indexed recipient,
@@ -147,7 +152,7 @@ contract MonadBirthdayVault is Ownable, ReentrancyGuard {
         bool precompileSuccess = tryStakeInMonadPrecompile(msg.value);
 
         emit ContributionReceived(_vaultId, msg.sender, msg.value, _message, vault.totalCollected);
-        emit StakedInMonadPrecompile(_vaultId, msg.value, precompileSuccess);
+        emit StakedInMonadPrecompile(_vaultId, STAKING_PRECOMPILE, msg.value, precompileSuccess);
     }
 
     /**

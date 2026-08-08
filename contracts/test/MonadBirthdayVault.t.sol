@@ -63,6 +63,25 @@ contract MonadBirthdayVaultTest is Test {
         assertEq(greetings[0].message, "Happy Birthday Alice! From Bob");
     }
 
+    event StakedInMonadPrecompile(
+        uint256 indexed vaultId,
+        address indexed targetPrecompile,
+        uint256 amount,
+        bool precompileSuccess
+    );
+
+    function test_StakedInMonadPrecompileEvent() public {
+        vm.prank(contributor1);
+        uint256 vaultId = vault.createVault(recipient, "Alice", 30, 10 ether);
+
+        // Expect StakedInMonadPrecompile event emitted with targetPrecompile = 0x1000
+        vm.expectEmit(true, true, false, true, address(vault));
+        emit StakedInMonadPrecompile(vaultId, address(0x1000), 1 ether, true);
+
+        vm.prank(contributor1);
+        vault.contribute{value: 1 ether}(vaultId, "Happy Birthday!");
+    }
+
     function test_ReleaseGiftDemoMode() public {
         vm.prank(contributor1);
         uint256 vaultId = vault.createVault(recipient, "Alice", 30, 10 ether);

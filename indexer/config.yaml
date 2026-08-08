@@ -6,7 +6,7 @@ networks:
     contracts:
       - name: MonadBirthdayVault
         address:
-          - "0x5f2394E6Bc3Dd842831C66253d4433f4F72B4E7B"
+          - "0xd3146Aabe8a4f50426d0d12A67ecca0ebEB06764"
         handler: src/EventHandlers.ts
         events:
           - event: VaultCreated(uint256 indexed vaultId, address indexed creator, address indexed recipient, string recipientName, uint256 targetAmount, uint256 birthdayTimestamp)
