@@ -307,24 +307,6 @@ function App() {
         </div>
       </section>
 
-      {/* Neo-Brutalist Footer */}
-      <footer className="bg-[#111111] text-white border-t-4 border-black px-6 py-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-[#CCFF00] border-3 border-black text-black font-black flex items-center justify-center rounded shadow-[2px_2px_0px_0px_#FFF]">
-              🎁
-            </div>
-            <div>
-              <span className="text-lg font-black uppercase text-[#CCFF00]">MonadWishes</span>
-              <p className="text-xs text-slate-400 font-bold">Built for Monad Blockchain Hackathon 2026</p>
-            </div>
-          </div>
-          <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-            Smart Contracts Deployed on Monad Testnet (Chain ID 10143)
-          </div>
-        </div>
-      </footer>
-
       {/* Modals & Toast */}
       {isCreateOpen && (
         <CreateVaultModal

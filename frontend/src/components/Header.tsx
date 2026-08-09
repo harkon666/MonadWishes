@@ -16,7 +16,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b-4 border-black bg-[#FFFDF5] px-4 shadow-[0_4px_0px_0px_#000]">
-      <nav className="max-w-7xl mx-auto flex flex-wrap items-center justify-between py-3">
+      <nav className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 py-3">
         {/* Neo-Brutalist Brand Logo */}
         <Link
           to="/"
@@ -35,30 +35,33 @@ export default function Header() {
           </div>
         </Link>
 
-        {/* Navigation Links */}
-        <div className="flex items-center gap-6 text-sm font-black uppercase text-black">
-          <Link
-            to="/"
-            className="hover:bg-[#CCFF00] px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] transition-all"
-            activeProps={{ className: 'bg-[#CCFF00] font-black border-2 border-black shadow-[2px_2px_0px_0px_#000]' }}
-          >
-            Explore Vaults
-          </Link>
-          <a
-            href="https://testnet.monadexplorer.com"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:bg-[#00E5FF] px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] transition-all hidden sm:block text-black"
-          >
-            Explorer ↗
-          </a>
-        </div>
+        {/* Navigation & Controls Wrapper */}
+        <div className="flex items-center justify-between md:justify-end gap-4 w-full md:w-auto">
+          {/* Navigation Links */}
+          <div className="flex items-center gap-4 sm:gap-6 text-sm font-black uppercase text-black">
+            <Link
+              to="/"
+              className="hover:bg-[#CCFF00] px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] transition-all"
+              activeProps={{ className: 'bg-[#CCFF00] font-black border-2 border-black shadow-[2px_2px_0px_0px_#000]' }}
+            >
+              Explore Vaults
+            </Link>
+            <a
+              href="https://testnet.monadexplorer.com"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:bg-[#00E5FF] px-2 py-1 border-2 border-black shadow-[2px_2px_0px_0px_#000] transition-all hidden sm:block text-black"
+            >
+              Explorer ↗
+            </a>
+          </div>
 
-        {/* Social Login / Wallet Auth Controls */}
-        <div className="flex items-center gap-3">
-          {mounted ? <PrivyHeaderControls /> : (
-            <div className="h-10 w-36 rounded-lg border-3 border-black bg-slate-200 animate-pulse shadow-[3px_3px_0px_0px_#000]" />
-          )}
+          {/* Social Login / Wallet Auth Controls */}
+          <div className="flex items-center gap-3">
+            {mounted ? <PrivyHeaderControls /> : (
+              <div className="h-10 w-32 rounded-lg border-3 border-black bg-slate-200 animate-pulse shadow-[3px_3px_0px_0px_#000]" />
+            )}
+          </div>
         </div>
       </nav>
     </header>
@@ -107,22 +110,19 @@ function PrivyHeaderControls() {
         )}
 
         {/* User Identity / Wallet Address Pill */}
-        <div className="flex items-center gap-2 rounded-lg border-3 border-black bg-[#FFD600] px-3.5 py-1.5 text-xs font-black text-black shadow-[3px_3px_0px_0px_#000]">
-          <span className="h-2.5 w-2.5 rounded-full bg-black animate-ping" />
-          <Wallet className="h-4 w-4 text-black" />
-          <span>{userIdentifier}</span>
+        <div className="flex items-center gap-2 rounded-lg border-3 border-black bg-[#FFD600] px-3 py-1.5 text-xs font-black text-black shadow-[3px_3px_0px_0px_#000] max-w-[150px] sm:max-w-none">
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-black animate-ping shrink-0" />
+          <Wallet className="h-4 w-4 text-black shrink-0" />
+          <span className="truncate max-w-[70px] sm:max-w-[120px]">{userIdentifier}</span>
 
           {walletAddress && (
             <button
               onClick={handleCopyAddress}
-              className="ml-1 rounded border-2 border-black bg-white p-1 text-black hover:bg-[#CCFF00] transition-all flex items-center gap-1 shadow-[1px_1px_0px_0px_#000]"
+              className="ml-1 rounded border-2 border-black bg-white p-1 text-black hover:bg-[#CCFF00] transition-all flex items-center justify-center shadow-[1px_1px_0px_0px_#000] shrink-0 w-6 h-6"
               title="Copy Privy Wallet Address"
             >
               {copied ? (
-                <>
-                  <Check className="h-3.5 w-3.5 text-black" />
-                  <span className="text-[10px] text-black font-black uppercase">Copied</span>
-                </>
+                <Check className="h-3.5 w-3.5 text-black" />
               ) : (
                 <Copy className="h-3.5 w-3.5 text-black" />
               )}
@@ -132,7 +132,7 @@ function PrivyHeaderControls() {
 
         <button
           onClick={logout}
-          className="p-2 rounded-lg border-3 border-black bg-[#FF5252] text-black hover:bg-[#FF0000] hover:text-white shadow-[3px_3px_0px_0px_#000] transition-all font-black"
+          className="p-2 rounded-lg border-3 border-black bg-[#FF5252] text-black hover:bg-[#FF0000] hover:text-white shadow-[3px_3px_0px_0px_#000] transition-all font-black shrink-0"
           title="Disconnect"
         >
           <LogOut className="h-4 w-4" />
@@ -144,7 +144,7 @@ function PrivyHeaderControls() {
   return (
     <button
       onClick={login}
-      className="flex items-center gap-2 rounded-lg border-3 border-black bg-[#CCFF00] px-5 py-2 text-sm font-black text-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none transition-all uppercase tracking-wide"
+      className="flex items-center gap-2 rounded-lg border-3 border-black bg-[#CCFF00] px-4 py-2 sm:px-5 text-xs sm:text-sm font-black text-black shadow-[4px_4px_0px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[0px] active:translate-y-[0px] active:shadow-none transition-all uppercase tracking-wide"
     >
       <LogIn className="h-4 w-4" />
       <span>Login</span>
