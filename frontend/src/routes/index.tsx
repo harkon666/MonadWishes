@@ -63,6 +63,46 @@ function App() {
     <div className="min-h-screen bg-[#FFFDF5] text-black font-sans selection:bg-[#CCFF00] selection:text-black">
       <NetworkSwitchBanner />
 
+      {/* Neo-Brutalist Infinite Scrolling Marquee Banner (Now positioned at the very top of the page body) */}
+      <div className="overflow-hidden border-b-4 border-black bg-[#111111] py-3 text-white shadow-[0_4px_0px_0px_#000]">
+        <div className="flex items-center">
+          {/* Static Tag Label */}
+          <div className="shrink-0 bg-[#CCFF00] text-black font-black uppercase px-4 py-1.5 border-r-4 border-black text-xs sm:text-sm tracking-wider z-10 shadow-[4px_0px_0px_0px_#000]">
+            FEATURED ON MONAD
+          </div>
+
+          {/* Scrolling Content Track (Duplicated for Seamless Loop) */}
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 font-black uppercase text-xs sm:text-sm tracking-wider text-slate-200 pl-6">
+            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
+            <span className="text-slate-500">•</span>
+            <span>PRIVY SOCIAL LOGIN</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-[#00E5FF]">✦ NATIVE STAKING PRECOMPILE (0x1000)</span>
+            <span className="text-slate-500">•</span>
+            <span>PYTH LIVE MON/USD PRICING</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-amber-300">✦ 100% ON-CHAIN SVG NFT BOOKLET</span>
+            <span className="text-slate-500">•</span>
+            <span>ENVIO GRAPHQL EVENT INDEXER</span>
+            <span className="text-slate-500">•</span>
+
+            {/* Duplicate for seamless infinite loop */}
+            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
+            <span className="text-slate-500">•</span>
+            <span>PRIVY SOCIAL LOGIN</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-[#00E5FF]">✦ NATIVE STAKING PRECOMPILE (0x1000)</span>
+            <span className="text-slate-500">•</span>
+            <span>PYTH LIVE MON/USD PRICING</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-amber-300">✦ 100% ON-CHAIN SVG NFT BOOKLET</span>
+            <span className="text-slate-500">•</span>
+            <span>ENVIO GRAPHQL EVENT INDEXER</span>
+            <span className="text-slate-500">•</span>
+          </div>
+        </div>
+      </div>
+
       {/* Neo-Brutalist Hero Header Section with Video Background */}
       <section className="relative overflow-hidden border-b-4 border-black bg-black px-6 py-12 sm:px-12 sm:py-20 shadow-[0_6px_0px_0px_#000]">
         {/* Video Background */}
@@ -135,46 +175,6 @@ function App() {
 
         </div>
       </section>
-
-      {/* Neo-Brutalist Infinite Scrolling Marquee Banner (Now positioned right below the Hero header section) */}
-      <div className="overflow-hidden border-b-4 border-black bg-[#111111] py-3 text-white shadow-[0_4px_0px_0px_#000]">
-        <div className="flex items-center">
-          {/* Static Tag Label */}
-          <div className="shrink-0 bg-[#CCFF00] text-black font-black uppercase px-4 py-1.5 border-r-4 border-black text-xs sm:text-sm tracking-wider z-10 shadow-[4px_0px_0px_0px_#000]">
-            FEATURED ON MONAD
-          </div>
-
-          {/* Scrolling Content Track (Duplicated for Seamless Loop) */}
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 font-black uppercase text-xs sm:text-sm tracking-wider text-slate-200 pl-6">
-            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
-            <span className="text-slate-500">•</span>
-            <span>PRIVY SOCIAL LOGIN</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-[#00E5FF]">✦ NATIVE STAKING PRECOMPILE (0x1000)</span>
-            <span className="text-slate-500">•</span>
-            <span>PYTH LIVE MON/USD PRICING</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-amber-300">✦ 100% ON-CHAIN SVG NFT BOOKLET</span>
-            <span className="text-slate-500">•</span>
-            <span>ENVIO GRAPHQL EVENT INDEXER</span>
-            <span className="text-slate-500">•</span>
-
-            {/* Duplicate for seamless infinite loop */}
-            <span className="flex items-center gap-2 text-[#CCFF00]">✦ MONAD TESTNET 0.3s BLOCK TIME</span>
-            <span className="text-slate-500">•</span>
-            <span>PRIVY SOCIAL LOGIN</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-[#00E5FF]">✦ NATIVE STAKING PRECOMPILE (0x1000)</span>
-            <span className="text-slate-500">•</span>
-            <span>PYTH LIVE MON/USD PRICING</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-amber-300">✦ 100% ON-CHAIN SVG NFT BOOKLET</span>
-            <span className="text-slate-500">•</span>
-            <span>ENVIO GRAPHQL EVENT INDEXER</span>
-            <span className="text-slate-500">•</span>
-          </div>
-        </div>
-      </div>
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 py-16 space-y-16" id="vaults-section">
