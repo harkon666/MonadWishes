@@ -26,6 +26,9 @@ function App() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [selectedVault, setSelectedVault] = useState<VaultData | null>(null)
+  
+  // Local state to hide specific vaults deleted/removed by user
+  const [hiddenVaultIds, setHiddenVaultIds] = useState<string[]>([])
 
   const handleCreateVault = async (newVaultData: {
     recipientName: string
@@ -186,33 +189,58 @@ function App() {
               ACTIVE BIRTHDAY <span className="bg-[#CCFF00] px-2 border-3 border-black shadow-[3px_3px_0px_0px_#000]">VAULTS.</span>
             </h2>
           </div>
-          <button
-            onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-2 rounded-md border-3 border-black bg-[#00E5FF] px-4 py-2 text-sm font-black uppercase text-black shadow-[3px_3px_0px_0px_#000] hover:bg-[#CCFF00] transition-all cursor-pointer"
-          >
-            <Plus className="h-4 w-4 stroke-[3]" />
-            <span>New Pool</span>
-          </button>
+          <div className="flex items-center gap-3">
+            {hiddenVaultIds.length > 0 && (
+              <button
+                onClick={() => setHiddenVaultIds([])}
+                className="flex items-center gap-1.5 rounded-md border-3 border-black bg-[#FF5252] px-3.5 py-2 text-xs font-black uppercase text-white shadow-[3px_3px_0px_0px_#000] hover:bg-[#FF0000] transition-all cursor-pointer"
+                title="Restore all hidden vault cards"
+              >
+                Restore Hidden ({hiddenVaultIds.length})
+              </button>
+            )}
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="flex items-center gap-2 rounded-md border-3 border-black bg-[#00E5FF] px-4 py-2 text-sm font-black uppercase text-black shadow-[3px_3px_0px_0px_#000] hover:bg-[#CCFF00] transition-all cursor-pointer"
+            >
+              <Plus className="h-4 w-4 stroke-[3]" />
+              <span>New Pool</span>
+            </button>
+          </div>
         </div>
 
         {/* Vault Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {vaults.map((vault, idx) => {
-            const progressPercent = Math.min(
-              100,
-              Math.round((vault.totalCollectedMon / vault.targetAmountMon) * 100)
-            )
-            const isCompleted = vault.totalCollectedMon >= vault.targetAmountMon
-            const rotateClass = idx % 2 === 0 ? '-rotate-1' : 'rotate-1'
+          {vaults
+            .filter((v) => !hiddenVaultIds.includes(v.id))
+            .map((vault, idx) => {
+              const progressPercent = Math.min(
+                100,
+                Math.round((vault.totalCollectedMon / vault.targetAmountMon) * 100)
+              )
+              const isCompleted = vault.totalCollectedMon >= vault.targetAmountMon
+              const rotateClass = idx % 2 === 0 ? '-rotate-1' : 'rotate-1'
 
-            return (
-              <div
-                key={vault.id}
-                onClick={() => setSelectedVault(vault)}
-                className={`group relative rounded-2xl border-4 border-black bg-white p-6 shadow-[6px_6px_0px_0px_#000] hover:shadow-[10px_10px_0px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] transition-all cursor-pointer ${rotateClass}`}
-              >
-                {/* Header Tag */}
-                <div className="flex items-center justify-between gap-2 mb-4">
+              return (
+                <div
+                  key={vault.id}
+                  onClick={() => setSelectedVault(vault)}
+                  className="group relative rounded-2xl border-4 border-black bg-white p-6 shadow-[6px_6px_0px_0px_#000] hover:shadow-[10px_10px_0px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] transition-all cursor-pointer rotate-0 sm:rotate-1"
+                >
+                  {/* Hide Card Button (Top-right corner, absolutely positioned) */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setHiddenVaultIds((prev) => [...prev, vault.id])
+                    }}
+                    className="absolute -top-3.5 -right-3.5 h-8 w-8 rounded-full border-3 border-black bg-[#FF5252] text-white hover:bg-black hover:text-[#CCFF00] flex items-center justify-center font-black shadow-[2px_2px_0px_0px_#000] transition-all z-20 cursor-pointer"
+                    title="Hide this vault card from list"
+                  >
+                    ×
+                  </button>
+
+                  {/* Header Tag */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
                   <span className="rounded-md border-2 border-black bg-[#CCFF00] px-2.5 py-1 text-xs font-black uppercase text-black shadow-[2px_2px_0px_0px_#000]">
                     Vault #{vault.numericId || vault.id}
                   </span>
