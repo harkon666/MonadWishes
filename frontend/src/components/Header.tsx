@@ -111,7 +111,6 @@ function PrivyHeaderControls() {
 
         {/* User Identity / Wallet Address Pill */}
         <div className="flex items-center gap-2 rounded-lg border-3 border-black bg-[#FFD600] px-3 py-1.5 text-xs font-black text-black shadow-[3px_3px_0px_0px_#000] max-w-[150px] sm:max-w-none">
-          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-black animate-ping shrink-0" />
           <Wallet className="h-4 w-4 text-black shrink-0" />
           <span className="truncate max-w-[70px] sm:max-w-[120px]">{userIdentifier}</span>
 
